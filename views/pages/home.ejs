@@ -1,0 +1,646 @@
+<%- include('../partials/head') %>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-4 sticky top-0 z-10">
+        <div class="container mx-auto lg:px-12 flex items-center justify-between">
+            <div class="text-xl font-bold">
+                <a href="./" class="flex items-center space-x-2">
+                    <img src="/img/logo.png" alt="Logo" class="w-50 h-10">
+                </a>
+            </div>
+            <div class="space-x-4">
+                <a href="/login" class="bg-yellow-500 text-black px-4 py-2 font-semibold rounded hover:bg-yellow-400">Login <i class="fa-solid fa-right-to-bracket"></i></a>
+            </div>
+        </div>
+    </header>    
+    
+    <!-- Gambar Slider (Carousel) -->
+    <section class="mb-12 lg:mb-28">
+        <div class="slider relative">
+            <div class="relative">
+                <img src="/img/banner_1.png" 
+                     alt="Banner EduPlatform" 
+                     class="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[calc(100vh-160px)] object-cover">
+            </div>
+            <div class="relative">
+                <img src="/img/banner_2.png" 
+                     alt="Banner EduPlatform" 
+                     class="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[calc(100vh-160px)] object-cover">
+            </div>            
+        </div>
+        <!-- Scroll Button -->
+        <div class="absolute bottom-4 left-0 right-0 text-center lg:block hidden">
+            <button onclick="scrollToSection()" class="px-6 py-2 text-gray-700 border-2 border-gray-700 rounded-full transition duration-900 hover:bg-gray-100 animate-bounce">
+                <i class="fa-solid fa-arrow-down"></i>
+            </button>            
+        </div>        
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 lg:px-16">
+
+        <section id="bank" class="grid md:grid-cols-3 gap-8 mb-14">
+            <!-- SD -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300">
+                <img src="/img/bank_soal.png" alt="Poster Soal" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">Bank Soal</h3>
+                    <p class="text-gray-600 mt-2">Kumpulan soal latihan yang dirancang untuk membantu siswa dapat memahami berbagai konsep dengan cara yang menyenangkan dan mudah diikuti.</p>
+                </div>
+            </div>
+        
+            <!-- SMP -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300">
+                <img src="/img/bank_quiz.png" alt="Poster Materi" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">Bank Materi</h3>
+                    <p class="text-gray-600 mt-2">Bank materi lengkap untuk siswa dapat memberikan pembahasan yang mendalam tentang berbagai topik yang sesuai dengan kurikulum.</p>
+                </div>
+            </div>
+        
+            <!-- SMA -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden transform hover:scale-105 transition duration-300">
+                <img src="/img/bank_materi.png" alt="Poster Quiz" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">Bank Quiz</h3>
+                    <p class="text-gray-600 mt-2">Berisi kumpulan kuis untuk membantu siswa mempersiapkan ujian dengan soal-soal yang lebih menantang dan kompleks.</p>
+                </div>
+            </div>
+        </section>
+                
+        <!-- Grafik Statistik Pendidikan -->
+        <section class="mb-12">
+            <h3 class="text-2xl font-semibold text-center mb-6">Jumlah Instansi Yang Terdaftar</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 flex justify-center items-center gap-8 lg:ml-[25%]">
+                <!-- Chart Section -->
+                <div class="flex justify-center items-center">
+                    <canvas id="myChart" class="w-full h-full lg:h-[350px]"></canvas>
+                </div>
+                
+                <!-- Data Section -->
+                <div class="flex justify-center opacity-0 transition-opacity duration-1000 lg:mr-[200px]">
+                    <div class="w-full lg:w-2/3 pt-4 lg:pt-0 px-4">
+                        <div class="flex lg:flex-col flex-wrap items-center justify-between">
+                            <!-- Total Pengunjung -->
+                            <div class="text-center mb-4 px-2">
+                                <i class="fa-solid fa-users text-5xl"></i>
+                                <h5 class="text-2xl font-bold text-gray-800">
+                                    <span id="totalUsers" data-target="1029">0</span>
+                                </h5>
+                                <h6 class="text-sm text-gray-500">Total Siswa</h6>
+                            </div>
+                            <div class="text-center mb-4 px-2">
+                                <i class="fa-solid fa-building text-5xl"></i>
+                                <h5 class="text-2xl font-bold text-gray-800">
+                                    <span id="totalInstitutions" data-target="163">0</span>
+                                </h5>
+                                <h6 class="text-sm text-gray-500">Total Instansi</h6>
+                            </div>
+                            <div class="text-center mb-4 px-2">
+                                <i class="fa-solid fa-landmark text-5xl"></i>
+                                <h5 class="text-2xl font-bold text-gray-800">
+                                    <span id="totalClasses" data-target="234">0</span>
+                                </h5>
+                                <h6 class="text-sm text-gray-500">Total Kelas</h6>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>                               
+            </div>
+        </section>        
+
+        <!-- Card Section: SD, SMP, SMA -->
+        <section id="pendidikan" class="grid md:grid-cols-3 gap-8 mb-12">
+            <!-- SD -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="/img/sd.png" alt="Poster SD" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">Pendidikan Dasar (SD)</h3>
+                    <p class="text-gray-600 mt-2">Materi pembelajaran yang menyenangkan dan mudah dipahami untuk siswa SD.</p>
+                </div>
+            </div>
+        
+            <!-- SMP -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="/img/smp.png" alt="Poster SMP" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">Pendidikan Menengah (SMP)</h3>
+                    <p class="text-gray-600 mt-2">Meningkatkan pemahaman siswa SMP dengan materi yang lebih menantang.</p>
+                </div>
+            </div>
+        
+            <!-- SMA -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <img src="/img/sma.png" alt="Poster SMA" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">Pendidikan Menengah Atas (SMA)</h3>
+                    <p class="text-gray-600 mt-2">Mempersiapkan siswa SMA dengan materi yang lebih kompleks dan persiapan ujian.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Promosi: Ajak Siswa dan Guru -->
+        <section class="bg-gradient-to-r from-green-500 to-blue-500 text-white py-8 px-6 text-center rounded-lg mb-12">
+            <p class="text-lg">jangan lewatkan kesempatan untuk bergabung dengan <b>EduPlatform!</b></p>
+            <p class="text-lg">daftarkan organisasi, instansi, atau sekolah Anda sekarang juga dan nikmati akses GRATIS</p>
+            <p class="text-lg mb-8">ke berbagai materi pembelajaran, soal, dan kuis yang interaktif.</p>
+            <button onclick="openRegister()" class="bg-white text-blue-500 py-2 px-6 rounded-lg text-lg font-bold hover:bg-gray-100">Daftar Sekarang</button>
+        </section>
+
+        <!-- Modal -->
+        <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden z-50">
+            <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:max-w-md md:max-w-lg lg:max-w-xl overflow-y-auto max-h-[calc(100vh-2rem)]">
+                <!-- Title -->
+                <h2 class="text-xl font-bold text-gray-800 mb-4 break-words whitespace-normal">
+                    Pendaftaran Organisasi/Instansi/Sekolah
+                </h2>
+        
+                <!-- Form -->
+                <form id="register" onsubmit="submitForm(event)">
+                    <div class="md:grid grid-cols-2 md:gap-4 space-y-2 md:space-y-0">
+                        <!-- Nama -->
+                        <div>
+                            <label for="instansi" class="block text-sm font-medium text-gray-700 mb-1">Organisasi / Instansi / Sekolah <span class="text-red-500">*</span></label>
+                            <input type="text" id="instansi" name="instansi" placeholder="Masukkan Organisasi / Instansi / Sekolah" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p id="instansi-msg" class="text-red-500 text-sm mt-1 hidden">Nama wajib diisi.</p>
+                        </div>
+                    
+                        <!-- Kategori -->
+                        <div>
+                            <label for="jenjang" class="block text-sm font-medium text-gray-700 mb-1">Jenjang Pendidikan <span class="text-red-500">*</span></label>
+                            <select id="jenjang" name="jenjang" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="" hidden>Pilih Jenjang</option>
+                                <option value="SD">SD</option>
+                                <option value="SMP">SMP</option>
+                                <option value="SMA">SMA</option>
+                                <option value="UMUM">Umum</option>
+                            </select>
+                            <p id="jenjang-msg" class="text-red-500 text-sm mt-1 hidden">Jenjang wajib diisi.</p>
+                        </div>
+                    
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" placeholder="Masukan Email" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p id="email-msg" class="text-red-500 text-sm mt-1 hidden">Email wajib diisi.</p>
+                        </div>
+                    
+                        <!-- Nomor Telepon -->
+                        <div>
+                            <label for="telepon" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon <span class="text-red-500">*</span></label>
+                            <input type="number" id="telepon" name="telepon" placeholder="Masukkan Nomor Telepon" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p id="telepon-msg" class="text-red-500 text-sm mt-1 hidden">Nomor Telepon wajib diisi.</p>
+                        </div>
+                        
+                        <div class="col-span-2">
+                            <label for="alamat" class="block text-sm font-medium text-gray-700 mb-1">Alamat Organisasi / Instansi / Sekolah <span class="text-red-500">*</span></label>
+                            <input type="text" id="alamat" name="alamat" placeholder="Masukan Alamat" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p id="alamat-msg" class="text-red-500 text-sm mt-1 hidden">Alamat wajib diisi.</p>
+                        </div>
+                    
+                        <!-- Website -->
+                        <div class="col-span-2">
+                            <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Website (Opsional)</label>
+                            <input type="url" id="website" name="website" placeholder="Masukkan Website" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>             
+        
+                    <!-- Action Buttons -->
+                    <div class="mt-6 flex justify-between">
+                        <button 
+                            type="button" 
+                            onclick="closeRegister()" 
+                            class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300"
+                        >
+                            Tutup
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600"
+                        >
+                            Kirim
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- FAQ and Google Maps Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Google Maps -->
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <h3 class="text-xl font-semibold p-4">Lokasi Kami</h3>
+                <div class="h-64">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4287.113249149068!2d112.72555767535133!3d-7.316165792691886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fba7b4c23af9%3A0x5df0b33f2d35347e!2sBaseCamp%20Pasiif%20(Private%20Only)!5e1!3m2!1sid!2sid!4v1733660498252!5m2!1sid!2sid" width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            
+
+            <!-- FAQ Section -->
+            <div class="bg-white shadow-lg rounded-lg p-4">
+                <h3 class="text-xl font-semibold mb-4">FAQ</h3>
+                <div class="space-y-4">
+                    <div>
+                        <button 
+                            class="w-full text-left bg-gray-200 p-2 rounded-lg focus:outline-none" 
+                            onclick="toggleFAQ('faq1')">
+                            Apa itu EduPlatform?
+                        </button>
+                        <div 
+                            id="faq1" 
+                            class="faq-content max-h-0 overflow-hidden transition-[max-height] duration-300 ease-in-out">
+                            <p class="p-2"><b>EduPlatform</b> adalah platform pembelajaran yang menyediakan materi, soal, dan kuis interaktif untuk siswa dan guru. Dengan fitur personalisasi dan pemantauan real-time, platform ini mendukung pembelajaran yang efektif dan kolaboratif, serta dilengkapi antarmuka yang ramah pengguna.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button 
+                            class="w-full text-left bg-gray-200 p-2 rounded-lg focus:outline-none" 
+                            onclick="toggleFAQ('faq2')">
+                            Bagaimana cara mendaftar?
+                        </button>
+                        <div 
+                            id="faq2" 
+                            class="faq-content max-h-0 overflow-hidden transition-[max-height] duration-300 ease-in-out">
+                            <p class="p-2">Pendaftaran di <b>EduPlatform</b> terdiri dari dua kategori: Organisasi/Instansi/Sekolah, yang dapat mendaftar melalui tombol "Daftar Sekarang" di halaman utama dengan mengisi formulir khusus, dan Siswa/Guru, yang mendaftar melalui halaman registrasi dengan format pendaftaran umum.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button 
+                            class="w-full text-left bg-gray-200 p-2 rounded-lg focus:outline-none" 
+                            onclick="toggleFAQ('faq3')">
+                            Apakah ada biaya untuk menggunakan EduPlatform?
+                        </button>
+                        <div 
+                            id="faq3" 
+                            class="faq-content max-h-0 overflow-hidden transition-[max-height] duration-300 ease-in-out">
+                            <p class="p-2"><b>EduPlatform</b> menyediakan akses gratis ke berbagai materi dan kuis, namun beberapa fitur premium mungkin memerlukan biaya.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-10 rounded-t-3xl mx-auto px-4 lg:px-16">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between gap-8">
+            <div>
+                <img src="/img/logo.png" alt="Logo" class="w-60 h-15 mb-2 cursor-pointer" onclick="scrollToTop()">
+                <p class="text-gray-200">Jl. Ketintang Baru XII No.26, RT.004/RW.03</p>
+                <p class="text-gray-200">Kec. Gayungan, Surabaya, Jawa Timur 60231</p>
+            </div>
+            <div class="text-left">
+                <h3 class="text-lg font-semibold mb-2">Media Sosial Kami</h3>
+                <ul class="space-y-2">
+                    <li><a href="javascript:void(0)" class="flex items-center gap-2 hover:underline">
+                        <i class="fab fa-instagram text-gray-200"></i><p class="text-gray-200">eduplatform</p>
+                    </a></li>
+                    <li><a href="javascript:void(0)" class="flex items-center gap-2 hover:underline">
+                        <i class="fab fa-facebook-f text-gray-200"></i><p class="text-gray-200">EduPlatform</p>
+                    </a></li>
+                    <li><a href="javascript:void(0)" class="flex items-center gap-2 hover:underline">
+                        <i class="fab fa-twitter text-gray-200"></i><p class="text-gray-200">@EduPlatform</p>
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-200 mt-8 pt-4 text-center">
+            <p class="text-gray-200">&copy; 2024 EduPlatform. Semua hak dilindungi.</p>
+        </div>
+
+        <button onclick="scrollToTop()" id="scrollToTopBtn" class="fixed bottom-6 right-2 px-4 bg-blue-600 text-white p-3 rounded-xl shadow-lg hover:bg-blue-700 transition-opacity duration-300 opacity-0 hidden">
+            <i class="fa-solid fa-arrow-up"></i>
+        </button>
+    </footer>     
+
+    <script>
+        window.addEventListener('scroll', () => {
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            if (window.scrollY > 200) {
+                scrollToTopBtn.classList.remove('hidden', 'opacity-0');
+            } else {
+                scrollToTopBtn.classList.add('hidden', 'opacity-0');
+            }
+        });
+
+        // Fungsi scroll ke atas
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function initScrollToTopButton() {
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+            // Tampilkan tombol saat scroll lebih dari 200px
+            function handleScroll() {
+                if (window.scrollY > 200) {
+                    scrollToTopBtn.classList.remove('hidden', 'opacity-0');
+                } else {
+                    scrollToTopBtn.classList.add('hidden', 'opacity-0');
+                }
+            }
+
+            // Fungsi scroll ke atas
+            function scrollToTop() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Tambahkan event listener
+            window.addEventListener('scroll', handleScroll);
+            scrollToTopBtn.addEventListener('click', scrollToTop);
+        }
+        // Scroll to the 'pendidikan' section when the button is clicked
+        function scrollToSection() {
+            const section = document.getElementById('bank');
+            const offset = 112; // Adjust this value based on your needs (e.g., navbar height)
+            
+            const sectionPosition = section.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({
+                top: sectionPosition - offset,
+                behavior: 'smooth'
+            });
+        }
+    </script>    
+    <!-- Script untuk Slick Carousel -->
+    <script>
+        $(document).ready(function(){
+            var slider = $('.slider');
+    
+            slider.slick({
+                autoplay: true,
+                autoplaySpeed: 5000,
+                dots: true,
+                arrows: false,
+                infinite: true,
+                fade: false,  // Horizontal scrolling
+                speed: 1500,
+                dotsClass: 'slick-dots absolute bottom-4 left-0 right-0 text-center', // Position dots inside the image
+            });
+    
+            // Pause the slider when the cursor enters the image area
+            slider.on('mouseenter', function() {
+                slider.slick('slickPause');
+            });
+    
+            // Resume the slider when the cursor leaves the image area
+            slider.on('mouseleave', function() {
+                slider.slick('slickPlay');
+            });
+        });
+    </script>
+    <script>
+        const xValues = ["Umum", "SD", "SMP", "SMA"];
+        const yValues = [55, 49, 44, 24];
+        const barColors = ["purple", "teal", "turquoise", "orange"];
+        
+        const config = {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues,
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const value = tooltipItem.raw;
+                                return ` Total: ${value}`;
+                            }
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutBounce'
+                },
+                scales: {
+                    x: {
+                        grid: { 
+                            display: true, 
+                            drawOnChartArea: true, 
+                            drawTicks: true, 
+                            color: "rgba(0, 0, 0, 0.1)"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { 
+                            display: true, 
+                            drawOnChartArea: true, 
+                            drawTicks: true, 
+                            color: "rgba(0, 0, 0, 0.1)"
+                        }
+                    }
+                }
+            }
+        };
+    
+        // Function to animate numbers
+        const animateValue = (element, start, end, duration) => {
+            let startTime = null;
+            const step = (timestamp) => {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const currentValue = Math.floor(progress * (end - start) + start);
+                element.textContent = currentValue;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        };
+    
+        // Intersection Observer for showing data section
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    // Show Data Section
+                    entry.target.classList.remove("opacity-0");
+                    entry.target.classList.add("opacity-100");
+    
+                    // Render chart
+                    const ctx = document.getElementById("myChart").getContext("2d");
+                    new Chart(ctx, config);
+    
+                    // Animate numbers
+                    const counters = document.querySelectorAll('[data-target]');
+                    counters.forEach((counter) => {
+                        const target = parseInt(counter.getAttribute('data-target'), 10);
+                        animateValue(counter, 0, target, 2000); // 2 second duration
+                    });
+    
+                    // Stop observing after the element is visible
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 }); // Trigger when 50% of element is visible
+        
+        // Observe the data section
+        const target = document.querySelector(".flex.justify-center.opacity-0");
+        observer.observe(target);
+    </script>
+    <script>
+        function toggleFAQ(id) {
+            // Tutup semua FAQ
+            const faqs = document.querySelectorAll(".faq-content");
+            faqs.forEach(faq => {
+                if (faq.id !== id) {
+                    faq.style.maxHeight = null; // Tutup FAQ lainnya
+                }
+            });
+
+            // Toggle FAQ yang dipilih
+            const selectedFAQ = document.getElementById(id);
+            if (selectedFAQ.style.maxHeight) {
+                selectedFAQ.style.maxHeight = null; // Tutup jika sudah terbuka
+            } else {
+                selectedFAQ.style.maxHeight = selectedFAQ.scrollHeight + "px"; // Buka dengan tinggi dinamis
+            }
+        }
+    </script>
+    <script>
+        function openRegister() {
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeRegister() {
+            const form = document.getElementById("register");
+
+            // Menyembunyikan modal
+            document.getElementById('modal').classList.add('hidden');
+
+            // Mereset form
+            form.reset();
+
+            // Menyembunyikan pesan kesalahan
+            const errorMessages = document.querySelectorAll('[id$="-msg"]');
+            errorMessages.forEach(msg => {
+                msg.classList.add('hidden'); // Sembunyikan pesan kesalahan
+            });
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("register");
+            
+            form.querySelectorAll("input, select").forEach((input) => {
+                input.addEventListener("input", () => {
+                    const msg = document.getElementById(`${input.id}-msg`);
+                    if (msg && input.value.trim() !== "") {
+                        msg.classList.add("hidden");
+                    }
+                });
+            });
+    
+            function submitForm(event) {
+                event.preventDefault();
+                let isValid = true;
+    
+                const formInputs = [
+                    { id: "instansi", msgId: "instansi-msg" },
+                    { id: "email", msgId: "email-msg" },
+                    { id: "jenjang", msgId: "jenjang-msg" },
+                    { id: "alamat", msgId: "alamat-msg" },
+                    { id: "telepon", msgId: "telepon-msg" }
+                ];
+
+                formInputs.forEach(({ id, msgId }) => {
+                    const input = document.getElementById(id);
+                    const msg = document.getElementById(msgId);
+
+                    if (input.value.trim() === "") {
+                        msg.classList.remove("hidden"); // Tampilkan pesan kesalahan
+                        isValid = false;
+                    } else {
+                        msg.classList.add("hidden"); // Sembunyikan pesan kesalahan
+                    }
+                });
+
+                if (isValid) {
+                    const instansi = document.getElementById('instansi').value;
+                    const jenjang = document.getElementById('jenjang').value;
+                    const email = document.getElementById('email').value;
+                    const telepon = document.getElementById('telepon').value;
+                    const alamat = document.getElementById('alamat').value;
+                    const website = document.getElementById('website').value;
+
+                    const userData = {
+                        instansi: instansi,
+                        jenjang: jenjang,
+                        email: email,
+                        telepon: telepon,
+                        alamat: alamat,
+                        website: website
+                    };
+                    
+                    sendData(userData)
+                    document.getElementById('modal').classList.add('hidden');
+                }
+            }
+
+            form.onsubmit = submitForm;
+        });
+        
+        function sendData(data) {
+            const form = document.getElementById("register");
+            const url = new URL('/api/instansi/register', window.location.origin);
+            Object.keys(data).forEach(key => url.searchParams.append(key, data[key]));
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    });
+                    form.reset();
+                } else if (data.status === "duplicate") {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Email Sudah Terdaftar!',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    });
+                } else if (data.status === "error") {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        text: data.message,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Menghubungi Server',
+                    text: 'Terjadi masalah saat mencoba menghubungi server.',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>

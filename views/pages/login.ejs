@@ -1,0 +1,249 @@
+<%- include('../partials/head') %>
+
+<body class="bg-gray-100 font-sans">
+    
+    <% if (session.alert) { %>
+        <script>
+            Swal.fire({
+                icon: '<%= session.alert.icon %>',  // Ikon alert, bisa 'success', 'error', 'info', 'warning', dll
+                title: '<%= session.alert.type === "success" ? "Sukses" : "Gagal" %>',  // Judul berdasarkan type alert
+                text: '<%= session.alert.message %>',  // Pesan alert
+                confirmButtonText: 'OK'
+            }).then(() => {
+                setTimeout(() => {
+                    window.location.href = `/register?email=<%= session.alert.email %>`;
+                }, 2000);
+            })
+        </script>
+        <% delete session.alert; %> <!-- Menghapus session alert setelah ditampilkan -->
+    <% } %>       
+
+    <!-- Container -->
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white w-full max-w-md rounded-lg shadow-lg overflow-hidden">
+            
+            <!-- Header -->
+            <div class="bg-blue-100 p-6 text-center">
+                <h1 class="text-2xl font-bold text-blue-600">SELAMAT DATANG<br>DI EDUPLATFORM</h1>
+            </div>
+
+            <!-- Login with Google Button -->
+            
+            <!-- Form -->
+            <form id="login" class="p-6" onsubmit="submitForm(event)">
+                
+                <div class="mt-2 mb-6">
+                    <a href="javascript:void(0);" onclick="openGoogleAuth()" class="w-full border border-gray-300 text-gray-700 py-1 rounded-lg font-semibold hover:bg-gray-200 flex items-center justify-center">
+                        <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" alt="Google Logo" class="w-8 h-8 mr-1">
+                        Login dengan Google
+                    </a>
+                </div>
+
+                <div class="flex items-center justify-between mb-4">
+                    <hr class="border-t border-gray-300 w-full">
+                    <span class="mx-3 text-gray-700">atau</span>
+                    <hr class="border-t border-gray-300 w-full">
+                </div>
+                
+                <!-- Email -->
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</span></label>
+                    <input type="email" id="email" name="email" placeholder="Masukan Email" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p id="email-msg" class="text-red-500 text-sm mt-1 hidden">Email wajib diisi.</p>
+                </div>
+
+                <!-- Kata Sandi -->
+                <div class="mb-4 relative">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+                    <input type="password" id="password" name="password" placeholder="Masukkan Kata Sandi" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <i id="togglePassword" class="absolute top-10 right-3 fas fa-eye text-gray-500 cursor-pointer"></i>
+                    <p id="password-msg" class="text-red-500 text-sm mt-1 hidden">Kata Sandi wajib diisi.</p>
+                </div>
+                
+                <!-- Checkbox: Tetap Login -->
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" id="remember" name="remember" class="mr-2">
+                    <label for="remember" class="text-black">Ingat Saya</label>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-6 flex justify-between">
+                    <!-- Tombol Kembali, mengarah ke login.html -->
+                    <a href="/">
+                        <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300">Kembali</button>
+                    </a>
+                    
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600">Login</button>
+                </div>
+                
+                <!-- Link ke Register -->
+                <div class="mt-4 text-center">
+                    <p class="text-black">Belum memiliki akun? <a href="/register" class="text-blue-500 hover:underline font-semibold">Daftar Sekarang</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div id="alert" class="fixed bottom-6 right-6 text-white z-50 p-4 rounded-lg shadow-lg hidden">
+        <p><i id="alertIcon"></i><span id="alertMessage"></span></p>
+    </div>  
+
+    <script>
+        function showAlert(message, icon, color) {
+            const alertElement = document.getElementById('alert');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMessage = document.getElementById('alertMessage');
+
+            // Update ikon dan pesan
+            alertIcon.className = icon; // Mengganti kelas ikon
+            alertMessage.textContent = ` ${message}`; // Mengganti pesan
+            alertElement.className = `fixed bottom-6 right-6 text-white z-50 p-4 rounded-lg shadow-lg hidden ${color}`;
+
+            // Tampilkan alert
+            alertElement.classList.remove('hidden');
+
+            // Sembunyikan alert setelah 3 detik
+            setTimeout(() => {
+                alertElement.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+ 
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = password.type === 'password' ? 'text' : 'password';
+            password.type = type;
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
+    <script>
+        function openGoogleAuth() {
+            const width = 500;
+            const height = 600;
+            const left = (window.screen.width / 2) - (width / 2);
+            const top = (window.screen.height / 2) - (height / 2);
+            
+            const authWindow = window.open(
+                '/api/auth/google',
+                'GoogleLogin',
+                `width=${width},height=${height},top=${top},left=${left}`
+            );
+    
+            window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) {
+                    console.error('Invalid origin:', event.origin);
+                    return;
+                }
+    
+                const { status, message, user } = event.data;
+    
+                if (status === 'success') {
+                    showAlert(message, 'fas fa-check-circle', 'bg-green-500');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 3000);
+                } else if (status === 'not found') {
+                    showAlert(message, 'fa-solid fa-xmark', 'bg-red-500');
+                    setTimeout(() => {
+                        window.location.href = `/register?nama=${user.name}&email=${user.email}&profile=${user.profile}`;
+                    }, 3000);
+                }
+    
+                // Pastikan popup tertutup jika belum
+                if (authWindow && !authWindow.closed) {
+                    authWindow.close();
+                }
+            });
+        }
+    </script>   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("login");
+            
+            form.querySelectorAll("input, select").forEach((input) => {
+                input.addEventListener("input", () => {
+                    const msg = document.getElementById(`${input.id}-msg`);
+                    if (msg && input.value.trim() !== "") {
+                        msg.classList.add("hidden");
+                    }
+                });
+            });
+    
+            function submitForm(event) {
+                event.preventDefault();
+                let isValid = true;
+    
+                const emailInput = document.getElementById("email");
+                const emailMsg = document.getElementById("email-msg");
+                if (emailInput.value.trim() === "") {
+                    emailMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    emailMsg.classList.add("hidden");
+                }
+                
+                const passwordInput = document.getElementById("password");
+                const passwordMsg = document.getElementById("password-msg");
+                if (passwordInput.value === "") {
+                    passwordMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    passwordMsg.classList.add("hidden");
+                }
+    
+                if (isValid) {
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const remember = document.getElementById('remember').checked;
+
+                    const userData = {
+                        email: email,
+                        password: password,
+                        remember: remember
+                    };
+                    
+                    sendData(userData)
+                }
+            }
+
+            form.onsubmit = submitForm;
+        });
+        
+        function sendData(data) {
+            const url = new URL('/api/users/login', window.location.origin);
+            Object.keys(data).forEach(key => url.searchParams.append(key, data[key]));
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showAlert(data.message, 'fas fa-check-circle', 'bg-green-500');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 3000);
+                } else if (data.status === "not found") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                } else if (data.status === "wrong password") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                } else if (data.status === "error") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Terjadi masalah saat mencoba menghubungi server.', 'fa-solid fa-xmark', 'bg-red-500');
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,438 @@
+<%- include('../../partials/head') %>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-10 bg-blue-600 text-white p-2 rounded-md">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen">
+        <%- include('../../partials/sidebar-siswa') %>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="flex-1 p-6 lg:p-8 transition-all duration-300 ease-in-out w-full lg:ml-64">
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 mt-12 lg:mt-0">
+                <h2 class="text-2xl lg:text-3xl font-semibold mb-4 lg:mb-0">Selamat Datang, <span class="text-blue-600 font-bold" id="username"><%= user.users_nama %></span></h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Info (Email and Institution Name) -->
+                    <div class="flex flex-col text-right hidden lg:block lg:text-left cursor-pointer" id="profileInfo">
+                        <p class="text-sm font-semibold text-gray-600" id="email"><%= user.users_email %></p>
+                        <p class="text-sm font-semibold text-gray-600" id="institution"><%= user.users_instansi %></p>
+                    </div>
+                
+                    <!-- Profile Image and Dropdown -->
+                    <div class="relative">
+                        <img src="<%= user.users_profile %>" alt="Foto Profil" class="w-10 h-10 rounded-full cursor-pointer" id="profilePic">
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute mt-2 w-48 transform -translate-x-1/2 left-1/2 lg:left-auto lg:right-[-100px] bg-white shadow-lg rounded-lg z-10 hidden" id="dropdownMenu">
+                            <ul>
+                                <li><a href="#editProfile" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Edit Profil</a></li>
+                                <li><a href="#logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Left Section (Assignment Details) -->
+            <div class="flex-1 bg-white p-6 rounded-lg shadow-md mb-6 lg:mb-0">
+                <h2 class="text-2xl font-semibold mb-4"><%= tugas.tugas_judul %></h2>
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                        <i class="fas fa-file-alt text-gray-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-xl font-bold">0/100 poin</p>
+                        <p id="data-tugas" class="text-gray-600"></p>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4"><%= tugas.tugas_deskripsi %></p>
+                <div class="border rounded-lg p-4 mb-4 flex items-center">
+                    <!-- Icon preview task -->
+                    <img alt="Document preview" class="w-16 h-16 mr-4" src="https://storage.googleapis.com/a1aa/image/Jaltp2FSav6uKxobtzenjlWbImRYjoWJOKHORN68mebrVg6TA.jpg" />
+                    <!-- Task link with download icon -->
+                    <a class="flex items-center cursor-pointer p-2 rounded-md transition-all duration-200" href="#" download id="taskLink">
+                        <span class="mr-2 text-gray-800 hover:text-blue-600 transition-all duration-200"><%= tugas.tugas_filename %></span>
+                        <i class="fas fa-download text-green-600 mr-2 hover:text-green-700 transition-all duration-200" id="downloadIcon"></i>
+                    </a>                    
+                </div>
+            </div>
+    
+            <!-- Right Section (Submission Form) -->
+            <div class="w-full lg:w-1/3">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold mb-4">Pengumpulan Tugas</h2>
+
+                    <!-- Form Pengumpulan -->
+                    <form id="formPengumpulan" onsubmit="submitFormTugas(event)" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="penugasanOption" class="block text-sm font-medium text-gray-700">Pilih Metode Pengumpulan</label>
+                            <select id="penugasanOption" name="penugasanOption" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" onchange="toggleForm()">
+                                <option value="link">Tugas via Link</option>
+                                <option value="gdrive">Tugas via Google Drive</option>
+                                <option value="file">Upload File Tugas</option>
+                            </select>
+                            <p id="penugasanOption-msg" class="text-red-500 text-sm mt-1 hidden">Pilih metode pengumpulan terlebih dahulu.</p>
+                        </div>
+                    
+                        <!-- Form untuk upload file -->
+                        <div id="fileForm" class="mb-4 hidden">
+                            <label for="materiFile" class="block text-sm font-medium text-gray-700">Pilih File Tugas</label>
+                            <input type="file" id="materiFile" name="materiFile" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" accept=".pdf,.doc,.docx,application/vnd.google-apps.document">
+                            <p id="materiFile-msg" class="text-red-500 text-sm mt-1 hidden">Pilih file tugas untuk diunggah.</p>
+                            <p id="materiFileSize-msg" class="text-red-500 text-sm mt-1 hidden">Batas maksimal file 8MB.</p>
+                        </div>
+                    
+                        <!-- Form untuk URL link tugas -->
+                        <div id="linkForm" class="mb-4">
+                            <label for="materiLink" class="block text-sm font-medium text-gray-700">Link URL Tugas</label>
+                            <input type="url" id="materiLink" name="materiLink" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan URL">
+                            <p id="materiLink-msg" class="text-red-500 text-sm mt-1 hidden">Masukkan link tugas.</p>
+                        </div>
+                    
+                        <!-- Form untuk URL Google Drive -->
+                        <div id="gdriveForm" class="mb-4 hidden">
+                            <label for="materiGdrive" class="block text-sm font-medium text-gray-700">Link Google Drive</label>
+                            <input type="url" id="materiGdrive" name="materiGdrive" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan link Google Drive">
+                            <p id="materiGdrive-msg" class="text-red-500 text-sm mt-1 hidden">Masukkan link Google Drive tugas.</p>
+                        </div>
+                    
+                        <button id="submitTugas" type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md mt-4 hover:bg-blue-700">Kirim Tugas</button>
+                    </form>
+                    
+                    <script>
+                        function toggleForm() {
+                            const materiOption = document.getElementById('penugasanOption').value;
+                            const fileForm = document.getElementById('fileForm');
+                            const linkForm = document.getElementById('linkForm');
+                            const gdriveForm = document.getElementById('gdriveForm');
+                    
+                            // Reset semua form
+                            fileForm.classList.add('hidden');
+                            linkForm.classList.add('hidden');
+                            gdriveForm.classList.add('hidden');
+                    
+                            // Tampilkan form sesuai pilihan
+                            if (materiOption === 'file') {
+                                fileForm.classList.remove('hidden');
+                            } else if (materiOption === 'link') {
+                                linkForm.classList.remove('hidden');
+                            } else if (materiOption === 'gdrive') {
+                                gdriveForm.classList.remove('hidden');
+                            }
+                        }
+                    </script>                    
+                    
+                    <!-- Notifikasi Pengumpulan -->
+                    <div id="notif" class="hidden text-green-600 mt-4">
+                        <p>Tugas telah berhasil dikumpulkan!</p>
+                    </div>
+                    
+                    <!-- Pesan Tenggat Waktu -->
+                    <div id="lateNotif" class="hidden text-red-600 mt-4">
+                        <p>Anda telat untuk mengumpulkan tugas. Semoga tugas-tugas berikutnya Anda tidak telat lagi.</p>
+                        <br>
+                        <p>Silahkan anda menghubungi Guru dengan nomer berikut yang telah ada di dalam informasi.</p>
+                    </div>
+                    
+                    <!-- Informasi Tenggat Waktu -->
+                    <p class="text-gray-500 text-sm mt-4">Tugas tidak dapat diserahkan setelah batas waktu.</p>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Card Informasi Kontak Guru (Dihilangkan saat belum telat) -->
+        <div id="guruContactCard" class="hidden bg-white p-6 rounded-lg shadow-md mt-6">
+            <h3 class="text-2xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i> <!-- Ikon Informasi -->
+                Hubungi Guru
+            </h3>
+            <div class="flex items-start mb-4"> <!-- Mengatur ikon dan teks sejajar -->
+                <div class="w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <div class="ml-4 flex flex-col gap-1"> <!-- Menambahkan flex dan gap untuk pengaturan sejajar -->
+                    <p class="text-xl font-bold flex">
+                        <span class="w-36">Nomor Guru</span> <!-- Lebar tetap untuk label -->
+                        <span class="text-blue-600">: 0812-3456-7890</span>
+                    </p>
+                    <p class="text-gray-600 flex">
+                        <span class="w-36">Nama Guru</span> <!-- Lebar tetap untuk label -->
+                        <span>: DWI</span>
+                    </p>
+                    <p class="text-gray-600 flex">
+                        <span class="w-36">Jam Chat</span> <!-- Lebar tetap untuk label -->
+                        <span>: 08.00 - 15.00 WIB</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        // Menambahkan event listener pada taskLink
+        document.getElementById('taskLink').addEventListener('click', function (e) {
+            e.preventDefault(); // Mencegah aksi default dari tautan
+
+            const fileUrl = '<%= tugas.tugas_data %>'; // Gantilah URL ini dengan URL tugas Anda
+            const taskType = 'pdf'; // Bisa diubah sesuai jenis tugas
+    
+            // Menangani tugas berdasarkan tipe
+            if (taskType === 'pdf') {
+                // Jika tugas PDF, langsung mengunduh
+                const link = document.createElement('a');
+                link.href = fileUrl;
+                link.download = '<%= tugas.tugas_filename %>'; // Nama file yang akan diunduh
+                link.click(); // Trigger download
+                
+                // Menampilkan notifikasi menggunakan Toastify
+                Toastify({
+                    text: "Tugas berhasil diunduh!", // Pesan notifikasi
+                    duration: 3000, // Durasi notifikasi muncul (dalam milidetik)
+                    close: true, // Menampilkan tombol close
+                    gravity: "top", // Menempatkan notifikasi di atas halaman
+                    position: "right", // Posisi notifikasi di sebelah kanan
+                    backgroundColor: "#4CAF50", // Warna latar belakang notifikasi (hijau)
+                    stopOnFocus: true // Jika notifikasi diklik, ia tidak akan hilang
+                }).showToast(); // Menampilkan notifikasi Toastify
+            } else {
+                // Jika tugas bukan PDF, buka di tab baru
+                window.open(fileUrl, '_blank'); // Membuka tugas di tab baru
+            }
+        });
+    </script>
+    
+
+    <!-- Script untuk Sidebar Responsive -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const overlay = document.getElementById('overlay');
+        let isExpanded = true;
+
+        // Toggle untuk Desktop
+        function toggleDesktopSidebar() {
+            isExpanded = !isExpanded;
+            
+            if (!isExpanded) {
+                sidebar.style.width = '64px';
+                mainContent.style.marginLeft = '64px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(text => text.style.display = 'none');
+            } else {
+                sidebar.style.width = '256px';
+                mainContent.style.marginLeft = '256px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(text => text.style.display = 'inline');
+            }
+        }
+
+        // Toggle untuk Mobile
+        function toggleMobileSidebar() {
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('sidebarToggle').addEventListener('click', toggleDesktopSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        overlay.addEventListener('click', toggleMobileSidebar);
+
+        // Handle Responsive Behavior
+        function handleResize() {
+            const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+            
+            if (isDesktop) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                mainContent.style.marginLeft = isExpanded ? '256px' : '64px';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+    </script>
+    <script>
+        // Get the profile info, profile pic, and the dropdown menu
+        const profileInfo = document.getElementById('profileInfo');
+        const profilePic = document.getElementById('profilePic');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+    
+        // Add click event listener to the profile info and profile pic to toggle the dropdown menu
+        const toggleDropdown = () => {
+            dropdownMenu.classList.toggle('hidden');
+        };
+    
+        profileInfo.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        profilePic.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        // Optionally, close the dropdown when clicking outside of it
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && !profileInfo.contains(e.target) && !profilePic.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script> 
+    <script>
+        // Ambil blob dari tugas.tugas_data (misalnya, dari server atau API)
+        const blob = new Blob(['<%= JSON.stringify(tugas.tugas_data) %>'], { type: 'application/pdf' });
+    
+        // Buat URL objek dari blob
+        const url = URL.createObjectURL(blob);
+    
+        // Set href di elemen dengan ID 'taskLink'
+        document.getElementById('taskLink').setAttribute('href', url);
+    </script> 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("formPengumpulan");
+
+            // Fungsi untuk menangani submit form
+            function submitFormTugas(event) {
+                event.preventDefault(); // Mencegah submit form standar
+                let isValid = true;
+    
+                // Array untuk validasi input form
+                const formInputs = [
+                    { id: "penugasanOption", msgId: "penugasanOption-msg" }
+                ];
+    
+                // Validasi form inputs umum
+                formInputs.forEach(({ id, msgId }) => {
+                    const input = document.getElementById(id);
+                    const msg = document.getElementById(msgId);
+    
+                    if (input.value.trim() === "") {
+                        msg.classList.remove("hidden"); // Tampilkan pesan kesalahan
+                        isValid = false;
+                    } else {
+                        msg.classList.add("hidden"); // Sembunyikan pesan kesalahan
+                    }
+                });
+                
+                const materiOption = document.getElementById("penugasanOption").value;
+                if (materiOption === "file") {
+                    if (!materiFile.files.length) { // Memeriksa apakah file ada yang dipilih
+                        document.getElementById("materiFile-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        const fileSize = materiFile.files[0].size; // Ukuran file dalam byte
+                        const maxFileSize = 8 * 1024 * 1024; // 8MB dalam byte
+
+                        if (fileSize > maxFileSize) {
+                            document.getElementById("materiFileSize-msg").classList.remove("hidden");
+                            isValid = false;
+                        } else {
+                            document.getElementById("materiFile-msg").classList.add("hidden");
+                        }
+                    }
+                } else if (materiOption === "link") {
+                    const materiLink = document.getElementById("materiLink").value;
+                    if (!materiLink.trim()) {
+                        document.getElementById("materiLink-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        document.getElementById("materiLink-msg").classList.add("hidden");
+                    }
+                } else if (materiOption === "gdrive") {
+                    const materiLink = document.getElementById("materiGdrive").value;
+                    if (!materiLink.trim()) {
+                        document.getElementById("materiGdrive-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        document.getElementById("materiGdrive-msg").classList.add("hidden");
+                    }
+                }
+
+                if (isValid) {
+                    const id = '<%= tugas.tugas_id %>'; // Data kelas
+                    const kelas = '<%= tugas.tugas_kelas %>'; // Data kelas
+                    const metode = document.getElementById('penugasanOption').value; // Metode pengumpulan
+                    let content;
+
+                    // Memilih konten berdasarkan metode pengumpulan
+                    if (metode === "link") {
+                        content = document.getElementById('materiLink').value;
+                    } else if (metode === "gdrive") {
+                        content = document.getElementById('materiGdrive').value;
+                    } else if (metode === "file") {
+                        const fileInput = document.getElementById('materiFile');
+                        if (fileInput.files.length > 0) {
+                            content = fileInput.files[0];
+                        } else {
+                            showAlert('Silakan pilih file untuk diunggah.', 'fa-solid fa-xmark', 'bg-red-500');
+                            return;
+                        }
+                    }
+
+                    // Membuat FormData untuk mengirim data
+                    const formData = new FormData();
+                    formData.append('id', id)
+                    formData.append('kelas', kelas);
+                    formData.append('option', metode);
+                    formData.append('content', content);
+
+                    // Mengirim data ke backend
+                    sendDataTugas(formData, kelas);
+                }
+            }
+
+            // Menambahkan event listener untuk submit form
+            form.onsubmit = submitFormTugas;
+        });
+    
+        // Fungsi untuk mengirim data ke backend
+        function sendDataTugas(data) {
+            fetch('/api/upload-tugas/siswa', {
+                method: 'POST', // Menggunakan POST untuk mengirim data
+                body: data, // Mengirimkan data dalam format multipart/form-data
+            })
+            .then(response => response.json()) // Mengambil response dalam format JSON
+            .then(data => {
+                // Menangani berbagai status dari response
+                if (data.status === "success") {
+                    document.getElementById('notif').classList.remove('hidden');
+                    document.getElementById('submitTugas').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Menampilkan error di konsol
+                showAlert('Terjadi masalah saat mencoba menghubungi server.', 'fa-solid fa-xmark', 'bg-red-500');
+            });
+        }
+    </script>  
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const data = document.getElementById("data-tugas");
+            try {
+                const response = await fetch(`/api/users/search?email=${encodeURIComponent('<%= tugas.tugas_owner %>')}`);
+                const result = await response.json();
+                data.innerHTML = `${result.data[0].users_nama}  • <%= tugas.tugas_deadline.split(':').slice(0, 2).join(':') %>`
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        });
+    </script>  
+</body>
+</html>

@@ -1,0 +1,260 @@
+<%- include('../../partials/head') %>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-10 bg-blue-600 text-white p-2 rounded-md">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen">
+        <%- include('../../partials/sidebar-siswa') %>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="flex-1 mx-auto px-4 lg:px-16 p-4 lg:p-6 transition-all duration-300 ease-in-out w-full lg:ml-64">
+            <!-- Welcome Header -->
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 mt-12 lg:mt-0">
+                <h2 class="text-2xl lg:text-3xl font-semibold mb-4 lg:mb-0">Selamat Datang, <span class="text-blue-600 font-bold" id="username"><%= user.users_nama %></span></h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Info (Email and Institution Name) -->
+                    <div class="flex flex-col text-right hidden lg:block lg:text-left cursor-pointer" id="profileInfo">
+                        <p class="text-sm font-semibold text-gray-600" id="email"><%= user.users_email %></p>
+                        <p class="text-sm font-semibold text-gray-600" id="institution"><%= user.users_instansi %></p>
+                    </div>
+                
+                    <!-- Profile Image and Dropdown -->
+                    <div class="relative">
+                        <img src="<%= user.users_profile %>" alt="Foto Profil" class="w-10 h-10 rounded-full cursor-pointer" id="profilePic">
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute mt-2 w-48 transform -translate-x-1/2 left-1/2 lg:left-auto lg:right-[-100px] bg-white shadow-lg rounded-lg z-10 hidden" id="dropdownMenu">
+                            <ul>
+                                <li><a href="#editProfile" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Edit Profil</a></li>
+                                <li><a href="#logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informasi Dashboard -->
+            <section id="tugas" class="mb-8">
+                <!-- Bagian judul dan filter -->
+                <div class="mb-6 flex justify-between items-center">
+                    <!-- Teks di kiri -->
+                    <div class="text-2xl font-semibold">Daftar Tugas</div>
+            
+                    <!-- Filter di kanan -->
+                    <select id="filter" class="w-[160px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Filter Kelas</option>
+                    </select>    
+                </div>
+            
+                <!-- Grid untuk tugas -->
+                <div id="kelas-container" class="space-y-4"></div>
+                
+            </section>                       
+        </div>
+    </div>
+    
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const overlay = document.getElementById('overlay');
+        let isExpanded = true;
+
+        // Toggle untuk Desktop
+        function toggleDesktopSidebar() {
+            isExpanded = !isExpanded;
+            
+            if (!isExpanded) {
+                sidebar.style.width = '64px';
+                mainContent.style.marginLeft = '64px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(text => text.style.display = 'none');
+            } else {
+                sidebar.style.width = '256px';
+                mainContent.style.marginLeft = '256px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(text => text.style.display = 'inline');
+            }
+        }
+
+        // Toggle untuk Mobile
+        function toggleMobileSidebar() {
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('sidebarToggle').addEventListener('click', toggleDesktopSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        overlay.addEventListener('click', toggleMobileSidebar);
+
+        // Handle Responsive Behavior
+        function handleResize() {
+            const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+            
+            if (isDesktop) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                mainContent.style.marginLeft = isExpanded ? '256px' : '64px';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+    </script>
+    <script>
+        // Get the profile info, profile pic, and the dropdown menu
+        const profileInfo = document.getElementById('profileInfo');
+        const profilePic = document.getElementById('profilePic');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+    
+        // Add click event listener to the profile info and profile pic to toggle the dropdown menu
+        const toggleDropdown = () => {
+            dropdownMenu.classList.toggle('hidden');
+        };
+    
+        profileInfo.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        profilePic.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        // Optionally, close the dropdown when clicking outside of it
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && !profileInfo.contains(e.target) && !profilePic.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>    
+
+    <script>
+        // Referensi ke elemen <select> untuk filter kelas
+        const filterSelect = document.getElementById('filter');
+
+        // Array untuk menyimpan daftar kelas yang diambil dari API
+        let kelasList = [];
+
+        // Fungsi untuk mengambil daftar kelas dari API
+        async function fetchSubjects() {
+            try {
+                const response = await fetch('/api/daftar-kelas?email=<%= user.users_email %>');
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data dari API');
+                }
+                const data = await response.json();
+
+                // Menyimpan daftar kelas ke dalam kelasList
+                kelasList = data.map(item => item.kode);
+
+                // Hapus opsi default "Memuat data..."
+                filterSelect.innerHTML = '';
+
+                // Tambahkan opsi default
+                const defaultOption = document.createElement('option');
+                defaultOption.value = kelasList;
+                defaultOption.textContent = 'Semua Kelas';
+                filterSelect.appendChild(defaultOption);
+
+                // Iterasi data dan tambahkan ke dropdown
+                data.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.kode; // Ganti sesuai struktur data API
+                    option.textContent = subject.kelas; // Ganti sesuai struktur data API
+                    filterSelect.appendChild(option);
+                });
+
+                fetchPengumumanData(kelasList);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('pengumuman-msg').classList.remove('hidden');
+                filterSelect.innerHTML = '<option value="">Tidak ada kelas</option>';
+            }
+        }
+
+        // Fungsi untuk mengambil pengumuman berdasarkan kelas yang dipilih
+        async function fetchPengumumanData(kelas) {
+            try {
+                const response = await fetch(`/api/tugas?kelas=${kelas}`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data pengumuman');
+                }
+                const data = await response.json();
+
+                const kelasContainer = document.getElementById('kelas-container');
+                kelasContainer.innerHTML = ''; // Bersihkan kontainer sebelum menampilkan data baru
+
+                // Jika data kosong, tampilkan pesan pengumuman kosong
+                if (data.length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.innerHTML = `
+                            </div>
+                        </section>
+                        <p class="text-gray-500 text-center mt-40">Tidak ada tugas untuk ditampilkan.</p>
+                    `;
+                    kelasContainer.appendChild(emptyMessage);
+                    return; // Hentikan eksekusi jika tidak ada pengumuman
+                }
+
+                // Iterasi data dan buat elemen HTML untuk setiap kelas
+                data.forEach(item => {
+                    const kelasCard = document.createElement('div');
+                    kelasCard.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-lg', 'mb-6');
+
+                    kelasCard.innerHTML = `
+                        <div class="flex items-center justify-between mb-4">
+                            <!-- Kiri: Foto Profil dan Informasi -->
+                            <div class="flex items-center">
+                                <div>
+                                    <div class="flex flex-col lg:flex-row items-start">
+                                        <h4 class="text-sm lg:text-xl font-medium mr-2">${item.judul_tugas}</h4>
+                                    </div>
+                                    <!-- Tanggal -->
+                                    <span class="text-red-500 text-sm">${item.deadline.split(':').slice(0, 2).join(':')}</span>
+                                </div>
+                            </div>
+                            <!-- Kanan: Kategori -->
+                            <span class="text-gray-400 text-sm lg:text-xl font-medium">${item.nama_kelas}</span>
+                        </div>
+                        <!-- Deskripsi -->
+                        <p class="text-gray-600 text-sm mb-4">${item.deskripsi}</p>
+                        <!-- Tombol -->
+                        <a href="/dashboard/kelas/${item.kelas}/tugas/${item.id.split('-')[1]}" class="text-blue-500 hover:underline">Lihat Tugas</a>
+                    `;
+
+                    kelasContainer.appendChild(kelasCard);
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Event listener untuk filter kelas
+        filterSelect.addEventListener('change', (event) => {
+            const selectedKelas = event.target.value;
+            fetchPengumumanData(selectedKelas); // Ambil pengumuman berdasarkan kelas yang dipilih
+        });
+
+        // Inisialisasi dengan mengambil daftar kelas
+        fetchSubjects();
+    </script>  
+</body>
+</html>

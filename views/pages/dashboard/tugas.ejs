@@ -1,0 +1,168 @@
+<%- include('../../partials/head') %>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-10 bg-blue-600 text-white p-2 rounded-md">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen">
+        <%- include('../../partials/sidebar-siswa') %>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="flex-1 mx-auto px-4 lg:px-16 p-4 lg:p-6 transition-all duration-300 ease-in-out w-full lg:ml-64">
+            <!-- Welcome Header -->
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 mt-12 lg:mt-0">
+                <h2 class="text-2xl lg:text-3xl font-semibold mb-4 lg:mb-0">Selamat Datang, <span class="text-blue-600 font-bold" id="username"><%= user.users_nama %></span></h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Info (Email and Institution Name) -->
+                    <div class="flex flex-col text-right hidden lg:block lg:text-left cursor-pointer" id="profileInfo">
+                        <p class="text-sm font-semibold text-gray-600" id="email"><%= user.users_email %></p>
+                        <p class="text-sm font-semibold text-gray-600" id="institution"><%= user.users_instansi %></p>
+                    </div>
+                
+                    <!-- Profile Image and Dropdown -->
+                    <div class="relative">
+                        <img src="<%= user.users_profile %>" alt="Foto Profil" class="w-10 h-10 rounded-full cursor-pointer" id="profilePic">
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute mt-2 w-48 transform -translate-x-1/2 left-1/2 lg:left-auto lg:right-[-100px] bg-white shadow-lg rounded-lg z-10 hidden" id="dropdownMenu">
+                            <ul>
+                                <li><a href="#editProfile" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Edit Profil</a></li>
+                                <li><a href="#logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informasi Dashboard -->
+            <section id="tugas" class="mb-8">
+                <!-- Filter Mata Pelajaran -->
+            <div class="mb-6">
+                <label for="filter" class="block text-lg font-semibold mb-2">Filter Mata Pelajaran</label>
+                <select id="filter" class="w-full lg:w-1/3 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Semua Mata Pelajaran</option>
+                    <option value="matematika">Matematika</option>
+                    <option value="ipa">IPA</option>
+                    <option value="ips">IPS</option>
+                    <option value="inggris">Bahasa Inggris</option>
+                    <option value="bahasaindonesia">Bahasa Indonesia</option>
+                    <option value="agama">Agama</option>
+                    <option value="pendidikan jasmani">Pendidikan jasmani</option>
+                    <option value="pancasila">Pancasila</option>
+                    <option value="senibudaya">senibudaya</option>
+                </select>
+            </div>
+
+              <!-- Daftar Tugas -->
+              <section id="tugas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Tugas Matematika Dasar: Penjumlahan -->
+                <div class="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 tugas-card" data-mata-pelajaran="matematika">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-square-root-alt text-blue-600 w-8"></i>
+                            <h4 class="text-xl font-medium ml-3">Tugas Matematika Dasar: Penjumlahan</h4>
+                        </div>
+                        <span class="text-red-500 text-sm">Tenggat Waktu: 12 Desember 2024</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Kerjakan soal-soal tentang penjumlahan bilangan bulat. Selesaikan sebelum ujian.</p>
+                    <a href="tugassiswa.html" class="text-blue-500 hover:underline">Lihat Tugas</a>
+                </div>
+            
+                <!-- Tugas Matematika Dasar: Pengurangan -->
+                <div class="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 tugas-card" data-mata-pelajaran="matematika">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-square-root-alt text-blue-600 w-8"></i>
+                            <h4 class="text-xl font-medium ml-3">Tugas Matematika Dasar: Pengurangan</h4>
+                        </div>
+                        <span class="text-red-500 text-sm">Tenggat Waktu: 20 Desember 2024</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Kerjakan soal-soal tentang pengurangan bilangan bulat. Selesaikan sebelum ujian.</p>
+                    <a href="tugassiswa.html" class="text-blue-500 hover:underline">Lihat Tugas</a>
+                </div>
+            
+                <!-- Tugas IPA: Pengetahuan Alam -->
+                <div class="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 tugas-card" data-mata-pelajaran="ipa">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-flask text-green-600 w-8"></i>
+                            <h4 class="text-xl font-medium ml-3">Tugas IPA: Pengetahuan Alam</h4>
+                        </div>
+                        <span class="text-red-500 text-sm">Tenggat Waktu: 20 Desember 2024</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Pelajari tentang siklus air dan jelaskan dalam bentuk gambar dan penjelasan singkat.</p>
+                    <a href="tugasIPA.html" class="text-blue-500 hover:underline">Lihat Tugas</a>
+                </div>
+            
+            </section>
+            
+        </div>
+    </div>
+
+    <!-- Script untuk Sidebar Responsive -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const overlay = document.getElementById('overlay');
+        let isExpanded = true;
+
+        // Toggle untuk Desktop
+        function toggleDesktopSidebar() {
+            isExpanded = !isExpanded;
+            
+            if (!isExpanded) {
+                sidebar.style.width = '64px';
+                mainContent.style.marginLeft = '64px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(text => text.style.display = 'none');
+            } else {
+                sidebar.style.width = '256px';
+                mainContent.style.marginLeft = '256px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(text => text.style.display = 'inline');
+            }
+        }
+
+        // Toggle untuk Mobile
+        function toggleMobileSidebar() {
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('sidebarToggle').addEventListener('click', toggleDesktopSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        overlay.addEventListener('click', toggleMobileSidebar);
+    </script>
+
+     <!-- Script untuk Filter Mata Pelajaran -->
+     <script>
+        document.getElementById('filter').addEventListener('change', function(event) {
+            const selectedSubject = event.target.value;  // Menyimpan nilai yang dipilih
+            const tugasCards = document.querySelectorAll('.tugas-card');  // Mengambil semua elemen tugas-card
+            
+            tugasCards.forEach(card => {
+                // Memeriksa apakah nilai mata pelajaran yang dipilih kosong atau cocok dengan data-mata-pelajaran pada card
+                if (selectedSubject === '' || card.dataset.mataPelajaran === selectedSubject) {
+                    card.style.display = 'block';  // Menampilkan card yang cocok
+                } else {
+                    card.style.display = 'none';  // Menyembunyikan card yang tidak cocok
+                }
+            });
+        });
+    </script>
+</body>
+</html>

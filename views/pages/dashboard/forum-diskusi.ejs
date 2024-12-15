@@ -1,0 +1,418 @@
+<%- include('../../partials/head') %>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-10 bg-blue-600 text-white p-2 rounded-md">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen">
+        <%- include('../../partials/sidebar-siswa') %>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="flex-1 mx-auto px-4 lg:px-16 p-4 lg:p-6 transition-all duration-300 ease-in-out w-full lg:ml-64">
+            <!-- Welcome Header -->
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 mt-12 lg:mt-0">
+                <h2 class="text-2xl lg:text-3xl font-semibold mb-4 lg:mb-0">Selamat Datang, <span class="text-blue-600 font-bold" id="username"><%= user.users_nama %></span></h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Info (Email and Institution Name) -->
+                    <div class="flex flex-col text-right hidden lg:block lg:text-left cursor-pointer" id="profileInfo">
+                        <p class="text-sm font-semibold text-gray-600" id="email"><%= user.users_email %></p>
+                        <p class="text-sm font-semibold text-gray-600" id="institution"><%= user.users_instansi %></p>
+                    </div>
+                
+                    <!-- Profile Image and Dropdown -->
+                    <div class="relative">
+                        <img src="<%= user.users_profile %>" alt="Foto Profil" class="w-10 h-10 rounded-full cursor-pointer" id="profilePic">
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute mt-2 w-48 transform -translate-x-1/2 left-1/2 lg:left-auto lg:right-[-100px] bg-white shadow-lg rounded-lg z-10 hidden" id="dropdownMenu">
+                            <ul>
+                                <li><a href="#editProfile" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Edit Profil</a></li>
+                                <li><a href="#logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informasi Dashboard -->
+            <h3 class="text-2xl font-semibold mb-8">Forum Diskusi</h3>
+            <section id="diskusi" class="mb-12">
+                <div class="bg-white p-5 rounded-lg shadow-lg">
+                    <div class="flex flex-col space-y-4">
+                        <div class="h-[calc(100vh-400px)] lg:h-[calc(100vh-300px)] overflow-y-auto space-y-4" id="chat-box">
+                        </div>
+            
+                        <!-- Formulir untuk mengirim pesan -->
+                        <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-x-2 sm:space-y-0">
+                            <!-- Filter Kelas -->
+                            <select id="filter" class="w-full sm:w-[160px] lg:w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="" hidden><%= user.users_instansi %></option>
+                            </select>
+            
+                            <div class="flex items-center w-full">
+                                <input id="chat-input" type="text" placeholder="Ketik pesan..." class="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button id="send-btn" class="bg-blue-500 text-white p-2 rounded-lg ml-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>     
+        </div>
+    </div>
+    
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const overlay = document.getElementById('overlay');
+        let isExpanded = true;
+
+        // Toggle untuk Desktop
+        function toggleDesktopSidebar() {
+            isExpanded = !isExpanded;
+            
+            if (!isExpanded) {
+                sidebar.style.width = '64px';
+                mainContent.style.marginLeft = '64px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(text => text.style.display = 'none');
+            } else {
+                sidebar.style.width = '256px';
+                mainContent.style.marginLeft = '256px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(text => text.style.display = 'inline');
+            }
+        }
+
+        // Toggle untuk Mobile
+        function toggleMobileSidebar() {
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('sidebarToggle').addEventListener('click', toggleDesktopSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        overlay.addEventListener('click', toggleMobileSidebar);
+
+        // Handle Responsive Behavior
+        function handleResize() {
+            const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+            
+            if (isDesktop) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                mainContent.style.marginLeft = isExpanded ? '256px' : '64px';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+    </script>
+    <script>
+        // Get the profile info, profile pic, and the dropdown menu
+        const profileInfo = document.getElementById('profileInfo');
+        const profilePic = document.getElementById('profilePic');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+    
+        // Add click event listener to the profile info and profile pic to toggle the dropdown menu
+        const toggleDropdown = () => {
+            dropdownMenu.classList.toggle('hidden');
+        };
+    
+        profileInfo.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        profilePic.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        // Optionally, close the dropdown when clicking outside of it
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && !profileInfo.contains(e.target) && !profilePic.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>
+    <script>
+        document.getElementById('send-btn').addEventListener('click', function() {
+            const messageInput = document.getElementById('chat-input');
+            const messageText = messageInput.value.trim();
+            const chatBox = document.getElementById('chat-box');
+            const now = new Date();
+            const currentTime = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`
+    
+            if (messageInput.value.trim() !== '') {
+                const diskusiMsg = document.getElementById('diskusi-msg');
+                if (diskusiMsg) {
+                    diskusiMsg.classList.add('hidden');
+                }
+
+                const id = document.getElementById('filter').value;
+                fetch(`/api/diskusi/send?kode=${id}&email=<%= user.users_email %>&pesan=${messageText}`);
+                // Membuat elemen pesan baru
+                const messageDiv = document.createElement('div');
+                const messageTime = `<%= user.users_nama %> - ${currentTime}`;
+    
+                // Menggunakan class untuk pengirim pesan
+                const isUser = true; // Setel true untuk pesan pengguna, false untuk orang lain
+                const messageContainer = document.createElement('div');
+                const messageWrapper = document.createElement('div');
+                const messageContent = document.createElement('p');
+                const timeContent = document.createElement('div');
+    
+                messageContainer.classList.add(isUser ? 'bg-blue-100' : 'bg-gray-100', 'p-2', 'rounded-lg', 'max-w-xs');
+                messageWrapper.classList.add(isUser ? 'ml-auto' : '');
+                messageContent.classList.add('text-sm', 'text-gray-700');
+                timeContent.classList.add('text-xs', 'text-gray-500', 'mt-1');
+    
+                // Isi pesan dan waktu
+                messageContent.textContent = messageText;
+                timeContent.textContent = messageTime;
+    
+                // Menambahkan konten pesan ke dalam kotak pesan
+                messageContainer.appendChild(messageContent);
+                messageContainer.appendChild(timeContent);
+                messageWrapper.appendChild(messageContainer);
+    
+                // Menambahkan elemen gambar dan kontainer pesan ke dalam div
+                const imgElement = document.createElement('img');
+                imgElement.src = '<%= user.users_profile %>';
+                imgElement.alt = "User";
+                imgElement.classList.add('w-8', 'h-8', 'rounded-full', 'object-cover');
+                
+                messageDiv.classList.add('flex', 'items-start', 'space-x-2');
+                if (!isUser) messageDiv.appendChild(imgElement); // Orang lain dikiri
+                messageDiv.appendChild(messageWrapper);
+    
+                if (isUser) messageDiv.appendChild(imgElement); // Pengguna di kanan
+    
+                // Menambahkan pesan baru ke dalam kotak chat
+                chatBox.appendChild(messageDiv);
+    
+                // Menggulirkan ke bawah
+                chatBox.scrollTop = chatBox.scrollHeight;
+    
+                // Mengosongkan input setelah pesan terkirim
+                messageInput.value = '';
+            }
+        });
+    </script>       
+    <script>
+        // Referensi ke elemen <select> untuk filter kelas
+        const filterSelect = document.getElementById('filter');
+    
+        // Array untuk menyimpan daftar kelas yang diambil dari API
+        let kelasList = [];
+        let scrollOn = true; // Variabel untuk menyimpan status scroll
+        let scrollTimeout; // Variabel untuk menyimpan timeout
+
+        const box = document.getElementById('chat-box');
+        box.addEventListener('scroll', () => {
+            const isScrolledToBottom = box.scrollHeight - box.scrollTop === box.clientHeight;
+            if (isScrolledToBottom) {
+                scrollOn = true;
+            } else {
+                scrollOn = false;
+            }
+
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                scrollOn = true;
+            }, 5000);
+
+        });
+    
+        // Fungsi untuk mengambil daftar kelas dari API
+        async function fetchSubjects() {
+            try {
+                const response = await fetch('/api/daftar-kelas?email=<%= user.users_email %>');
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data dari API');
+                }
+                const data = await response.json();
+
+                // Menyimpan daftar kelas ke dalam kelasList
+                kelasList = data.map(item => item.kode);
+
+                // Hapus opsi default "Memuat data..."
+                filterSelect.innerHTML = '';
+
+                // Menambahkan pembatas antara instansi dan kelas
+                const optgroupInstansi = document.createElement('optgroup');
+                optgroupInstansi.label = 'Instansi';
+                filterSelect.appendChild(optgroupInstansi);
+
+                // Menambahkan pilihan instansi ke dalam optgroup
+                const instansiOption = document.createElement('option');
+                instansiOption.value = '<%= user.users_instansi %>';
+                instansiOption.textContent = '<%= user.users_instansi %>';
+                optgroupInstansi.appendChild(instansiOption);
+
+                // Menambahkan pembatas (optgroup) untuk kelas
+                const optgroupKelas = document.createElement('optgroup');
+                optgroupKelas.label = 'Kelas';
+                filterSelect.appendChild(optgroupKelas);
+
+                // Cek apakah data kelas kosong
+                if (data.length === 0) {
+                    const noKelasOption = document.createElement('option');
+                    noKelasOption.value = '';
+                    noKelasOption.textContent = 'Tidak ada kelas';
+                    noKelasOption.disabled = true;  // Menambahkan atribut disabled
+                    optgroupKelas.appendChild(noKelasOption);
+                } else {
+                    // Iterasi data kelas dan tambahkan ke dalam optgroup kelas
+                    data.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.kode; // Ganti sesuai struktur data API
+                        option.textContent = subject.kelas; // Ganti sesuai struktur data API
+                        optgroupKelas.appendChild(option);
+                    });
+                }
+
+                fetchDiskusiData('<%= user.users_instansi %>');
+            } catch (error) {
+                console.error(error);
+                document.getElementById('pengumuman-msg').classList.remove('hidden');
+                filterSelect.innerHTML = '<option value="">Tidak ada kelas</option>';
+            }
+        }
+    
+        // Fungsi untuk mengambil pengumuman berdasarkan kelas yang dipilih
+        async function fetchDiskusiData(kelas) {
+            try {
+                const response = await fetch(`/api/diskusi?id=${kelas}`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data');
+                }
+                const data = await response.json();
+
+                const chatBox = document.getElementById('chat-box'); 
+                chatBox.innerHTML = '';
+
+                // Jika data kosong, tampilkan pesan pengumuman kosong
+                if (data.length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.innerHTML = `
+                            </div>
+                        </section>
+                        <p id="diskusi-msg" class="text-gray-500 text-center mt-40">Tidak ada diskusi untuk forum ini.</p>
+                    `;
+                    chatBox.appendChild(emptyMessage);
+                    return; // Hentikan eksekusi jika tidak ada pengumuman
+                }
+
+                data.forEach(chat => {
+                    let timePart = chat.tanggal.split(", ")[1]; 
+                    let [hours, minutes] = timePart.split(":");
+                    let timeHHMM = `${hours}:${minutes}`;
+                    const messageDiv = document.createElement('div');
+                    let messageText = chat.pesan;
+                    let messageTime = `${chat.nama} - ${timeHHMM}`;
+
+                    // Menentukan apakah ini pesan dari pengguna atau orang lain
+                    const messageContainer = document.createElement('div');
+                    const messageWrapper = document.createElement('div');
+                    const messageContent = document.createElement('p');
+                    const timeContent = document.createElement('div');
+
+                    // Mengatur kelas untuk pesan, menggunakan kondisi if else untuk menentukan warna latar belakang
+                    if (chat.owner == '<%= user.users_email %>') {
+                        // Pesan dari pengguna
+                        messageContainer.classList.add('bg-blue-100', 'p-2', 'rounded-lg', 'max-w-xs');
+                        messageWrapper.classList.add('ml-auto'); // Mengatur posisi di kanan untuk pesan pengguna
+                    } else {
+                        // Pesan dari orang lain
+                        messageContainer.classList.add('bg-gray-100', 'p-2', 'rounded-lg', 'max-w-xs');
+                        messageWrapper.classList.remove('ml-auto'); // Menghapus posisi di kanan untuk pesan orang lain
+                    }
+
+                    messageContent.classList.add('text-sm', 'text-gray-700');
+                    timeContent.classList.add('text-xs', 'text-gray-500', 'mt-1');
+
+                    // Isi pesan dan waktu
+                    messageContent.textContent = messageText;
+                    timeContent.textContent = messageTime;
+
+                    // Menambahkan konten pesan ke dalam kotak pesan
+                    messageContainer.appendChild(messageContent);
+                    messageContainer.appendChild(timeContent);
+                    messageWrapper.appendChild(messageContainer);
+
+                    // Menambahkan elemen gambar dan kontainer pesan ke dalam div
+                    const imgElement = document.createElement('img');
+                    imgElement.src = chat.profile;
+                    imgElement.alt = "User";
+                    imgElement.classList.add('w-8', 'h-8', 'rounded-full', 'object-cover');
+
+                    // Menambahkan elemen chat dan menentukan posisi gambar
+                    messageDiv.classList.add('flex', 'items-start', 'space-x-2');
+
+                    if (chat.owner == '<%= user.users_email %>') {
+                        // Untuk pesan pengguna, gambar di kanan
+                        messageDiv.appendChild(messageWrapper);
+                        messageDiv.appendChild(imgElement);
+                    } else {
+                        // Untuk pesan orang lain, gambar di kiri
+                        messageDiv.appendChild(imgElement);
+                        messageDiv.appendChild(messageWrapper);
+                    }
+
+                    // Menambahkan pesan baru ke dalam kotak chat
+                    chatBox.appendChild(messageDiv);
+
+                    if (scrollOn) {
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+    
+        let filterNow = '<%= user.users_instansi %>'
+        // Event listener untuk filter kelas
+        filterSelect.addEventListener('change', (event) => {
+            const selectedKelas = event.target.value;
+            filterNow = selectedKelas;
+            fetchDiskusiData(selectedKelas);
+        });
+
+        function checkForNewMessages() {
+            fetch(`/api/diskusi?id=${filterNow}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Cek apakah data baru ditambahkan
+                    if (data && data.length > 0) {
+                        fetchDiskusiData(filterNow)
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+        fetchSubjects();
+        window.addEventListener('load', () => {
+            setInterval(checkForNewMessages, 500); // Cek setiap 5 detik
+        });
+    </script>         
+</body>
+</html>

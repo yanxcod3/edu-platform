@@ -1,0 +1,858 @@
+<%- include('../../partials/head') %>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-10 bg-blue-600 text-white p-2 rounded-md">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen">
+        <%- include('../../partials/sidebar-siswa') %>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="flex-1 mx-auto px-4 lg:px-16 p-4 lg:p-6 transition-all duration-300 ease-in-out w-full lg:ml-64">
+            <!-- Welcome Header -->
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 mt-12 lg:mt-0">
+                <h2 class="text-2xl lg:text-3xl font-semibold mb-4 lg:mb-0">Selamat Datang, <span class="text-blue-600 font-bold" id="username"><%= user.users_nama %></span></h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Info (Email and Institution Name) -->
+                    <div class="flex flex-col text-right hidden lg:block lg:text-left cursor-pointer" id="profileInfo">
+                        <p class="text-sm font-semibold text-gray-600" id="email"><%= user.users_email %></p>
+                        <p class="text-sm font-semibold text-gray-600" id="institution"><%= user.users_instansi %></p>
+                    </div>
+                
+                    <!-- Profile Image and Dropdown -->
+                    <div class="relative">
+                        <img src="<%= user.users_profile %>" alt="Foto Profil" class="w-10 h-10 rounded-full cursor-pointer" id="profilePic">
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute mt-2 w-48 transform -translate-x-1/2 left-1/2 lg:left-auto lg:right-[-100px] bg-white shadow-lg rounded-lg z-10 hidden" id="dropdownMenu">
+                            <ul>
+                                <li><a href="#editProfile" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Edit Profil</a></li>
+                                <li><a href="#logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section id="grafik" class="mb-12">
+                <h3 class="text-2xl font-semibold mb-4">Dashboard Guru</h3>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <canvas id="classStudentChart"></canvas>
+                    <p id="noDataMessage" class="text-gray-500 text-center">Grafik kelas tidak tersedia.</p>
+                </div>
+            </section>
+
+            <!-- Manajemen Materi Pembelajaran -->
+            <section id="materi" class="mb-12">
+                <h3 class="text-2xl font-semibold mb-4">Manajemen Materi Pembelajaran</h3>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-medium mb-2">Upload Materi</h4>
+                    <form id="materiForm" onsubmit="submitForm(event)" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="kelasMateri" class="block text-sm font-medium text-gray-700">Pilih Kelas</label>
+                            <select id="kelasMateri" name="kelasMateri" class="mt-1 p-2 w-full border rounded-lg bg-gray-50">
+                                <option value="">Pilih Kelas</option>
+                            </select>
+                            <p id="kelasMateri-msg" class="text-red-500 text-sm mt-1 hidden">Pilih kelas terlebih dahulu.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="materiOption" class="block text-sm font-medium text-gray-700">Pilih Jenis Materi</label>
+                            <select id="materiOption" name="materiOption" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" onchange="toggleForm()">
+                                <option value="" hidden>Pilih Jenis</option>
+                                <option value="file">File</option>
+                                <option value="link">Link URL</option>
+                            </select>
+                            <p id="materiOption-msg" class="text-red-500 text-sm mt-1 hidden">Pilih jenis materi terlebih dahulu.</p>
+                        </div>
+                        
+                        <div id="judulForm" class="mb-4 hidden">
+                            <label for="materiNama" class="block text-sm font-medium text-gray-700">Judul Materi</label>
+                            <input type="text" id="materiNama" name="materiNama" placeholder="Masukan judul materi" class="mt-1 p-2 w-full border rounded-lg bg-gray-50">
+                            <p id="materiNama-msg" class="text-red-500 text-sm mt-1 hidden">Judul materi wajib diisi.</p>
+                        </div>
+                        <!-- Form untuk upload file -->
+                        <div id="fileForm" class="mb-4 hidden">
+                            <label for="materiFile" class="block text-sm font-medium text-gray-700">Pilih File Materi</label>
+                            <input type="file" id="materiFile" name="materiFile" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" accept=".pdf,.doc,.docx,application/vnd.google-apps.document">
+                            <p id="materiFile-msg" class="text-red-500 text-sm mt-1 hidden">Pilih file materi untuk diunggah.</p>
+                            <p id="materiFileSize-msg" class="text-red-500 text-sm mt-1 hidden">Batas maksimal file 8MB.</p>
+                        </div>
+                        
+                        <!-- Form untuk URL materi -->
+                        <div id="linkForm" class="mb-4 hidden">
+                            <label for="materiLink" class="block text-sm font-medium text-gray-700">Link URL Materi (YouTube/GDrive)</label>
+                            <input type="url" id="materiLink" name="materiLink" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan URL">
+                            <p id="materiLink-msg" class="text-red-500 text-sm mt-1 hidden">Masukkan link materi.</p>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-upload mr-2"></i>Upload Materi
+                        </button>
+                    </form>                    
+
+                    <!-- Upload Quiz -->
+                    <h4 class="text-xl font-medium mt-6 mb-2">Upload Quis</h4>
+                    <form id="quizForm" onsubmit="submitFormQuiz(event)" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="kelasQuiz" class="block text-sm font-medium text-gray-700">Pilih Kelas</label>
+                            <select id="kelasQuiz" name="kelasQuiz" class="mt-1 p-2 w-full border rounded-lg bg-gray-50">
+                                <option value="">Pilih Kelas</option>
+                            </select>
+                            <p id="kelasQuiz-msg" class="text-red-500 text-sm mt-1 hidden">Pilih kelas terlebih dahulu.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="quizOption" class="block text-sm font-medium text-gray-700">Pilih Jenis Kuis</label>
+                            <select id="quizOption" name="quizOption" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" onchange="toggleFormQuiz()">
+                                <option value="" hidden>Pilih Jenis</option>
+                                <option value="file">File</option>
+                                <option value="link">Link URL</option>
+                            </select>
+                            <p id="quizOption-msg" class="text-red-500 text-sm mt-1 hidden">Pilih jenis kuis terlebih dahulu.</p>
+                        </div>
+                        
+                        <div id="judulQuizForm" class="mb-4 hidden">
+                            <label for="quizNama" class="block text-sm font-medium text-gray-700">Judul Kuis</label>
+                            <input type="text" id="quizNama" name="quizNama" placeholder="Masukan judul kuis" class="mt-1 p-2 w-full border rounded-lg bg-gray-50">
+                            <p id="quizNama-msg" class="text-red-500 text-sm mt-1 hidden">Judul quis wajib diisi.</p>
+                        </div>
+                        <!-- Form untuk upload file kuis -->
+                        <div id="fileQuizForm" class="mb-4 hidden">
+                            <label for="quizFile" class="block text-sm font-medium text-gray-700">Pilih File Quis (Google Forms)</label>
+                            <input type="file" id="quizFile" name="quizFile" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" accept=".pdf,.doc,.docx,application/vnd.google-apps.document">
+                            <p id="quizFile-msg" class="text-red-500 text-sm mt-1 hidden">Pilih file quis untuk diunggah.</p>
+                            <p id="quizFileSize-msg" class="text-red-500 text-sm mt-1 hidden">Batas maksimal file 8MB.</p>
+                        </div>
+                        
+                        <!-- Form untuk URL kuis -->
+                        <div id="linkQuizForm" class="mb-4 hidden">
+                            <label for="quizLink" class="block text-sm font-medium text-gray-700">Link URL Quis (Quizizz)</label>
+                            <input type="url" id="quizLink" name="quizLink" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan URL">
+                            <p id="quizLink-msg" class="text-red-500 text-sm mt-1 hidden">Masukkan link quis.</p>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-upload mr-2"></i>Upload Quis
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Penugasan -->
+            <section id="penugasan" class="mb-12">
+                <h3 class="text-2xl font-semibold mb-4">Penugasan</h3>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-medium mb-2">Buat Tugas</h4>
+                    <form id="penugasanForm" onsubmit="submitFormTugas(event)" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="penugasanKelas" class="block text-sm font-medium text-gray-700">Pilih Kelas</label>
+                            <select id="penugasanKelas" name="penugasanKelas" class="mt-1 p-2 w-full border rounded-lg bg-gray-50">
+                                <option value="">Pilih Kelas</option>
+                            </select>
+                            <p id="penugasanKelas-msg" class="text-red-500 text-sm mt-1 hidden">Pilih kelas terlebih dahulu.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="penugasanTitle" class="block text-sm font-medium text-gray-700">Judul Tugas</label>
+                            <input type="text" id="penugasanTitle" name="penugasanTitle" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan judul tugas" aria-label="Judul Tugas">
+                            <p id="penugasanTitle-msg" class="text-red-500 text-sm mt-1 hidden">Judul tugas wajib diisi.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="penugasanDeadline" class="block text-sm font-medium text-gray-700">Deadline Tugas</label>
+                            <input type="datetime-local" id="penugasanDeadline" name="penugasanDeadline" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan deadline tugas" aria-label="Deadline Tugas">
+                            <p id="penugasanDeadline-msg" class="text-red-500 text-sm mt-1 hidden">Deadline tugas wajib diisi.</p>    
+                        </div>                    
+                        <div class="mb-4 relative">
+                            <label for="penugasanDesc" class="block text-sm font-medium text-gray-700">Deskripsi Tugas</label>
+                            <textarea id="penugasanDesc" name="penugasanDesc" placeholder="Masukan deskripsi tugas"
+                                class="mt-1 p-2 w-full border rounded-lg bg-gray-50" 
+                                rows="4" aria-label="Deskripsi Tugas" 
+                                maxlength="2000" 
+                                oninput="updateCharCounter(this)"></textarea>
+                            <div id="charCounter" class="absolute right-2 bottom-2 text-gray-500 text-sm"> 0 / 2000</div>
+                            <p id="penugasanDesc-msg" class="text-red-500 text-sm mt-1 hidden">Deskripsi tugas wajib diisi.</p>
+                        </div>
+                        <div class="mb-4">
+                            <label for="penugasanFile" class="block text-sm font-medium text-gray-700">Unggah Tugas</label>
+                            <input type="file" id="penugasanFile" name="penugasanFile" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" accept=".pdf,.doc,.docx,application/vnd.google-apps.document">
+                            <small class="text-gray-500">Format yang diperbolehkan: PDF & Word</small>
+                            <p id="penugasanFile-msg" class="text-red-500 text-sm mt-1 hidden">Pilih file tugas untuk diunggah.</p>
+                            <p id="penugasanFile-msg" class="text-red-500 text-sm mt-1 hidden">Batas maksimal file 8MB.</p>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300">
+                            <i class="fas fa-upload mr-2"></i>Buat Tugas
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Penilaian -->
+            <section id="penilaian" class="mb-12">
+                <h3 class="text-2xl font-semibold mb-4">Penilaian</h3>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-xl font-medium mb-2">Penilaian Tugas</h4>
+                    <form id="penilaianForm" action="#" method="post">
+                        <div class="mb-4">
+                            <label for="kelas" class="block text-sm font-medium text-gray-700">Pilih Kelas</label>
+                            <select id="kelas" name="kelas" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" required>
+                                <option value="">Pilih Kelas</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="tugas" class="block text-sm font-medium text-gray-700">Pilih Tugas</label>
+                            <select id="tugas" name="tugas" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" required>
+                                <option value="">Pilih Tugas</option>
+                                <option value="tugas1">Tugas 1</option>
+                                <option value="tugas2">Tugas 2</option>
+                                <option value="tugas3">Tugas 3</option>
+                                <option value="tugas4">Tugas 4</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="penilaianSiswa" class="block text-sm font-medium text-gray-700">Pilih Siswa</label>
+                            <select id="penilaianSiswa" name="penilaianSiswa" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" required>
+                                <option value="">Pilih Siswa</option>
+                                <option value="siswa1">Siswa 1</option>
+                                <option value="siswa2">Siswa 2</option>
+                                <option value="siswa3">Siswa 3</option>
+                                <option value="siswa4">Siswa 4</option>
+                            </select>
+                        </div>                        
+                        <div class="mb-4">
+                            <label for="penilaianNilai" class="block text-sm font-medium text-gray-700">Nilai</label>
+                            <input type="number" id="penilaianNilai" name="penilaianNilai" class="mt-1 p-2 w-full border rounded-lg bg-gray-50" placeholder="Masukkan nilai siswa" required>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Berikan Nilai</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="alert" class="fixed bottom-6 right-6 text-white z-50 p-4 rounded-lg shadow-lg hidden">
+        <p><i id="alertIcon"></i><span id="alertMessage"></span></p>
+    </div>  
+    
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const overlay = document.getElementById('overlay');
+        let isExpanded = true;
+
+        // Toggle untuk Desktop
+        function toggleDesktopSidebar() {
+            isExpanded = !isExpanded;
+            
+            if (!isExpanded) {
+                sidebar.style.width = '64px';
+                mainContent.style.marginLeft = '64px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(text => text.style.display = 'none');
+            } else {
+                sidebar.style.width = '256px';
+                mainContent.style.marginLeft = '256px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(text => text.style.display = 'inline');
+            }
+        }
+
+        // Toggle untuk Mobile
+        function toggleMobileSidebar() {
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('sidebarToggle').addEventListener('click', toggleDesktopSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        overlay.addEventListener('click', toggleMobileSidebar);
+
+        // Handle Responsive Behavior
+        function handleResize() {
+            const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+            
+            if (isDesktop) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                mainContent.style.marginLeft = isExpanded ? '256px' : '64px';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+    </script>
+    <script>
+        // Get the profile info, profile pic, and the dropdown menu
+        const profileInfo = document.getElementById('profileInfo');
+        const profilePic = document.getElementById('profilePic');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+    
+        // Add click event listener to the profile info and profile pic to toggle the dropdown menu
+        const toggleDropdown = () => {
+            dropdownMenu.classList.toggle('hidden');
+        };
+    
+        profileInfo.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        profilePic.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        // Optionally, close the dropdown when clicking outside of it
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && !profileInfo.contains(e.target) && !profilePic.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>    
+
+    <!-- Script untuk Chart -->
+    <script>
+        let dataKelas = [];
+
+        const ctx = document.getElementById('classStudentChart').getContext('2d');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const classStudentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: 'Jumlah Siswa',
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)' // Tambahan warna jika diperlukan
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)' // Tambahan warna jika diperlukan
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        // Fungsi untuk mengambil data dari API
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/daftar-kelas?email=<%= user.users_email %>');
+                const data = await response.json();
+                
+                const filterSelectKelasMateri = document.getElementById('kelasMateri');
+                const filterSelectKelasQuiz = document.getElementById('kelasQuiz');
+                const filterSelectKelas = document.getElementById('penugasanKelas');
+                const filterSelectTugas = document.getElementById('kelas');
+
+                // Kosongkan dropdown sebelum menambahkan opsi
+                filterSelectKelasMateri.innerHTML = '';
+                filterSelectKelasQuiz.innerHTML = '';
+                filterSelectKelas.innerHTML = '';
+                filterSelectTugas.innerHTML = '';
+
+                // Tambahkan opsi default
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Pilih Kelas';
+                defaultOption.classList.add('hidden');
+
+                // Tambahkan opsi default ke setiap dropdown
+                filterSelectKelasMateri.appendChild(defaultOption.cloneNode(true));
+                filterSelectKelasQuiz.appendChild(defaultOption.cloneNode(true));
+                filterSelectKelas.appendChild(defaultOption.cloneNode(true));
+                filterSelectTugas.appendChild(defaultOption.cloneNode(true));
+
+                // Iterasi data dan tambahkan ke dropdown
+                data.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.kode; // Ganti sesuai struktur data API
+                    option.textContent = subject.kelas; // Ganti sesuai struktur data API
+
+                    // Tambahkan opsi ke setiap dropdown
+                    filterSelectKelasMateri.appendChild(option.cloneNode(true));
+                    filterSelectKelasQuiz.appendChild(option.cloneNode(true));
+                    filterSelectKelas.appendChild(option.cloneNode(true));
+                    filterSelectTugas.appendChild(option.cloneNode(true));
+                });
+
+                if (data.length < 1) {
+                    noDataMessage.style.display = 'block';
+                    document.getElementById('classStudentChart').style.display = 'none';
+                    return;
+                } else {
+                    // Memproses data dari API
+                    dataSiswa = data.map(item => item.total); // Total siswa per kelas
+                    dataKelas = data.map(item => item.kelas); // Nama kelas
+        
+                    // Update chart dengan data yang diambil
+                    classStudentChart.data.labels = dataKelas;
+                    classStudentChart.data.datasets[0].data = dataSiswa;
+                }
+    
+                // Render ulang chart
+                classStudentChart.update();
+                noDataMessage.style.display = 'none';
+                document.getElementById('classStudentChart').style.display = 'block';
+            } catch (error) {
+                console.error('Gagal mengambil data:', error);
+            }
+        }
+        
+
+        // Memanggil fetchData saat halaman selesai dimuat
+        window.addEventListener('load', fetchData);
+    </script>   
+    <script>
+        // Fungsi untuk menampilkan form sesuai dengan pilihan
+        function toggleForm() {
+            const materiOption = document.getElementById('materiOption').value;
+            const judulForm = document.getElementById('judulForm');
+            const fileForm = document.getElementById('fileForm');
+            const linkForm = document.getElementById('linkForm');
+    
+            // Menampilkan atau menyembunyikan form berdasarkan pilihan
+            if (materiOption === 'file') {
+                judulForm.classList.remove('hidden');
+                fileForm.classList.remove('hidden');
+                linkForm.classList.add('hidden');
+                document.getElementById("materiNama").value = ""; // Mengosongkan input file
+                document.getElementById("materiFile").value = ""; // Mengosongkan input file
+                document.getElementById("materiFile-msg").classList.add("hidden");
+                document.getElementById("materiFileSize-msg").classList.add("hidden");
+                document.getElementById("materiNama-msg").classList.add("hidden");
+            } else if (materiOption === 'link') {
+                fileForm.classList.add('hidden');
+                judulForm.classList.remove('hidden');
+                linkForm.classList.remove('hidden');
+                document.getElementById("materiNama").value = ""; // Mengosongkan input file
+                document.getElementById("materiLink").value = ""; // Mengosongkan input link
+                document.getElementById("materiLink-msg").classList.add("hidden");
+                document.getElementById("materiNama-msg").classList.add("hidden");
+            }
+        }
+
+        function toggleFormQuiz() {
+            const quizOption = document.getElementById('quizOption').value;
+            const judulForm = document.getElementById('judulQuizForm');
+            const fileForm = document.getElementById('fileQuizForm');
+            const linkForm = document.getElementById('linkQuizForm');
+            
+            // Menampilkan atau menyembunyikan form berdasarkan pilihan
+            if (quizOption === 'file') {
+                judulForm.classList.remove('hidden');
+                fileForm.classList.remove('hidden');
+                linkForm.classList.add('hidden');
+                document.getElementById("quizNama").value = ""; // Mengosongkan input judul kuis
+                document.getElementById("quizFile").value = ""; // Mengosongkan input file kuis
+                document.getElementById("quizFile-msg").classList.add("hidden");
+                document.getElementById("quizFileSize-msg").classList.add("hidden");
+                document.getElementById("quizNama-msg").classList.add("hidden");
+            } else if (quizOption === 'link') {
+                fileForm.classList.add('hidden');
+                judulForm.classList.remove('hidden');
+                linkForm.classList.remove('hidden');
+                document.getElementById("quizNama").value = ""; // Mengosongkan input judul kuis
+                document.getElementById("quizLink").value = ""; // Mengosongkan input link kuis
+                document.getElementById("quizLink-msg").classList.add("hidden");
+                document.getElementById("quizNama-msg").classList.add("hidden");
+            }
+        }
+
+        function showAlert(message, icon, color) {
+            const alertElement = document.getElementById('alert');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMessage = document.getElementById('alertMessage');
+
+            // Update ikon dan pesan
+            alertIcon.className = icon; // Mengganti kelas ikon
+            alertMessage.textContent = ` ${message}`; // Mengganti pesan
+            alertElement.className = `fixed bottom-6 right-6 text-white z-50 p-4 rounded-lg shadow-lg hidden ${color}`;
+
+            // Tampilkan alert
+            alertElement.classList.remove('hidden');
+
+            // Sembunyikan alert setelah 3 detik
+            setTimeout(() => {
+                alertElement.classList.add('hidden');
+            }, 3000);
+        }
+    </script>        
+    <script>
+        function updateCharCounter(textarea) {
+            const charCounter = document.getElementById('charCounter');
+            const currentLength = textarea.value.length;
+            const maxLength = textarea.getAttribute('maxlength');
+            charCounter.textContent = `${currentLength} / ${maxLength}`;
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("materiForm");
+    
+            // Menangani event input pada form
+            form.querySelectorAll("input, select").forEach((input) => {
+                input.addEventListener("input", () => {
+                    const msg = document.getElementById(`${input.id}-msg`);
+                    if (msg && input.value.trim() !== "") {
+                        msg.classList.add("hidden");
+                    }
+                });
+            });
+    
+            // Fungsi untuk menangani submit form
+            function submitForm(event) {
+                event.preventDefault(); // Mencegah submit form standar
+                let isValid = true;
+    
+                // Array untuk validasi input form
+                const formInputs = [
+                    { id: "kelasMateri", msgId: "kelasMateri-msg" },
+                    { id: "materiOption", msgId: "materiOption-msg" }
+                ];
+    
+                // Validasi form inputs umum
+                formInputs.forEach(({ id, msgId }) => {
+                    const input = document.getElementById(id);
+                    const msg = document.getElementById(msgId);
+    
+                    if (input.value.trim() === "") {
+                        msg.classList.remove("hidden"); // Tampilkan pesan kesalahan
+                        isValid = false;
+                    } else {
+                        msg.classList.add("hidden"); // Sembunyikan pesan kesalahan
+                    }
+                });
+                
+                const materiOption = document.getElementById("materiOption").value;
+                if (materiOption === "file") {
+                    if (!materiFile.files.length) { // Memeriksa apakah file ada yang dipilih
+                        document.getElementById("materiFile-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        const fileSize = materiFile.files[0].size; // Ukuran file dalam byte
+                        const maxFileSize = 8 * 1024 * 1024; // 8MB dalam byte
+
+                        if (fileSize > maxFileSize) {
+                            document.getElementById("materiFileSize-msg").classList.remove("hidden");
+                            isValid = false;
+                        } else {
+                            document.getElementById("materiFile-msg").classList.add("hidden");
+                        }
+                    }
+                } else if (materiOption === "link") {
+                    const judulForm = document.getElementById("materiNama").value;
+                    if (!judulForm.trim()) {
+                        document.getElementById("materiNama-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        document.getElementById("materiNama-msg").classList.add("hidden");
+                    }
+                    const materiLink = document.getElementById("materiLink").value;
+                    if (!materiLink.trim()) {
+                        document.getElementById("materiLink-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        document.getElementById("materiLink-msg").classList.add("hidden");
+                    }
+                }
+    
+                // Jika semua validasi lulus, lanjutkan untuk mengirim data
+                if (isValid) {
+                    const kelas = document.getElementById('kelasMateri').value;
+                    const nama = document.getElementById('materiNama').value;
+                    const formData = new FormData(); // Membuat FormData untuk mengirim data
+                    formData.append('kelas', kelas); // Menambahkan kelas ke FormData
+                    formData.append('nama', nama); // Menambahkan kelas ke FormData
+                    formData.append('option', materiOption); // Menambahkan jenis materi ke FormData
+    
+                    // Jika materi berupa file
+                    if (materiOption === 'file') {
+                        const fileInput = document.getElementById('materiFile');
+                        const file = fileInput.files[0]; // Ambil file pertama yang dipilih
+                        formData.append('content', file); // Menambahkan file ke FormData
+                    } else if (materiOption === 'link') {
+                        const linkInput = document.getElementById('materiLink');
+                        formData.append('content', linkInput.value); // Menambahkan link ke FormData
+                    }
+    
+                    // Kirim data ke backend
+                    sendData(formData);
+                }
+            }
+    
+            // Menambahkan event listener untuk submit form
+            form.onsubmit = submitForm;
+        });
+    
+        // Fungsi untuk mengirim data ke backend
+        function sendData(data) {
+            const kelas = document.getElementById('kelasMateri').value;
+            fetch('/api/upload-materi', {
+                method: 'POST', // Menggunakan POST untuk mengirim data
+                body: data, // Mengirimkan data dalam format multipart/form-data
+            })
+            .then(response => response.json()) // Mengambil response dalam format JSON
+            .then(data => {
+                // Menangani berbagai status dari response
+                if (data.status === "success") {
+                    showAlert(data.message, 'fas fa-check-circle', 'bg-green-500');
+                    setTimeout(() => {
+                        window.location.href = `/dashboard/kelas/${kelas}`;
+                    }, 1500);
+                } else if (data.status === "error") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Menampilkan error di konsol
+                showAlert('Terjadi masalah saat mencoba menghubungi server.', 'fa-solid fa-xmark', 'bg-red-500');
+            });
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("quizForm");
+    
+            // Menangani event input pada form
+            form.querySelectorAll("input, select").forEach((input) => {
+                input.addEventListener("input", () => {
+                    const msg = document.getElementById(`${input.id}-msg`);
+                    if (msg && input.value.trim() !== "") {
+                        msg.classList.add("hidden");
+                    }
+                });
+            });
+    
+            // Fungsi untuk menangani submit form
+            function submitFormQuiz(event) {
+                event.preventDefault(); // Mencegah submit form standar
+                let isValid = true;
+    
+                // Array untuk validasi input form
+                const formInputs = [
+                    { id: "kelasQuiz", msgId: "kelasQuiz-msg" },
+                    { id: "quizOption", msgId: "quizOption-msg" }
+                ];
+    
+                // Validasi form inputs umum
+                formInputs.forEach(({ id, msgId }) => {
+                    const input = document.getElementById(id);
+                    const msg = document.getElementById(msgId);
+    
+                    if (input.value.trim() === "") {
+                        msg.classList.remove("hidden"); // Tampilkan pesan kesalahan
+                        isValid = false;
+                    } else {
+                        msg.classList.add("hidden"); // Sembunyikan pesan kesalahan
+                    }
+                });
+    
+                const quizOption = document.getElementById("quizOption").value;
+                if (quizOption === "file") {
+                    if (!quizFile.files.length) { // Memeriksa apakah file ada yang dipilih
+                        document.getElementById("quizFile-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        const fileSize = quizFile.files[0].size; // Ukuran file dalam byte
+                        const maxFileSize = 8 * 1024 * 1024; // 8MB dalam byte
+    
+                        if (fileSize > maxFileSize) {
+                            document.getElementById("quizFileSize-msg").classList.remove("hidden");
+                            isValid = false;
+                        } else {
+                            document.getElementById("quizFile-msg").classList.add("hidden");
+                        }
+                    }
+                } else if (quizOption === "link") {
+                    const judulForm = document.getElementById("quizNama").value;
+                    if (!judulForm.trim()) {
+                        document.getElementById("quizNama-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        document.getElementById("quizNama-msg").classList.add("hidden");
+                    }
+                    const quizLink = document.getElementById("quizLink").value;
+                    if (!quizLink.trim()) {
+                        document.getElementById("quizLink-msg").classList.remove("hidden");
+                        isValid = false;
+                    } else {
+                        document.getElementById("quizLink-msg").classList.add("hidden");
+                    }
+                }
+    
+                // Jika semua validasi lulus, lanjutkan untuk mengirim data
+                if (isValid) {
+                    const kelas = document.getElementById('kelasQuiz').value;
+                    const nama = document.getElementById('quizNama').value;
+                    const formData = new FormData(); // Membuat FormData untuk mengirim data
+                    formData.append('kelas', kelas); // Menambahkan kelas ke FormData
+                    formData.append('nama', nama); // Menambahkan kelas ke FormData
+                    formData.append('option', quizOption); // Menambahkan jenis quiz ke FormData
+    
+                    // Jika quiz berupa file
+                    if (quizOption === 'file') {
+                        const fileInput = document.getElementById('quizFile');
+                        const file = fileInput.files[0]; // Ambil file pertama yang dipilih
+                        formData.append('content', file); // Menambahkan file ke FormData
+                    } else if (quizOption === 'link') {
+                        const linkInput = document.getElementById('quizLink');
+                        formData.append('content', linkInput.value); // Menambahkan link ke FormData
+                    }
+    
+                    // Kirim data ke backend
+                    sendDataQuiz(formData);
+                }
+            }
+    
+            // Menambahkan event listener untuk submit form
+            form.onsubmit = submitFormQuiz;
+        });
+    
+        // Fungsi untuk mengirim data ke backend
+        function sendDataQuiz(data) {
+            const kelas = document.getElementById('kelasQuiz').value;
+            fetch('/api/upload-quiz', {
+                method: 'POST', // Menggunakan POST untuk mengirim data
+                body: data, // Mengirimkan data dalam format multipart/form-data
+            })
+            .then(response => response.json()) // Mengambil response dalam format JSON
+            .then(data => {
+                // Menangani berbagai status dari response
+                if (data.status === "success") {
+                    showAlert(data.message, 'fas fa-check-circle', 'bg-green-500');
+                    setTimeout(() => {
+                        window.location.href = `/dashboard/kelas/${kelas}`;
+                    }, 1500);
+                } else if (data.status === "error") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Menampilkan error di konsol
+                showAlert('Terjadi masalah saat mencoba menghubungi server.', 'fa-solid fa-xmark', 'bg-red-500');
+            });
+        }
+    </script>   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("penugasanForm");
+    
+            // Menangani event input pada form
+            form.querySelectorAll("input, select").forEach((input) => {
+                input.addEventListener("input", () => {
+                    const msg = document.getElementById(`${input.id}-msg`);
+                    if (msg && input.value.trim() !== "") {
+                        msg.classList.add("hidden");
+                    }
+                });
+            });
+    
+            // Fungsi untuk menangani submit form
+            function submitFormTugas(event) {
+                event.preventDefault(); // Mencegah submit form standar
+                let isValid = true;
+    
+                // Array untuk validasi input form
+                const formInputs = [
+                    { id: "penugasanKelas", msgId: "penugasanKelas-msg" },
+                    { id: "penugasanTitle", msgId: "penugasanTitle-msg" },
+                    { id: "penugasanDeadline", msgId: "penugasanDeadline-msg" },
+                    { id: "penugasanDesc", msgId: "penugasanDesc-msg" },
+                    { id: "penugasanFile", msgId: "penugasanFile-msg" }
+                ];
+    
+                // Validasi form inputs umum
+                formInputs.forEach(({ id, msgId }) => {
+                    const input = document.getElementById(id);
+                    const msg = document.getElementById(msgId);
+    
+                    if (input.value.trim() === "") {
+                        msg.classList.remove("hidden"); // Tampilkan pesan kesalahan
+                        isValid = false;
+                    } else {
+                        msg.classList.add("hidden"); // Sembunyikan pesan kesalahan
+                    }
+                });
+    
+                // Jika semua validasi lulus, lanjutkan untuk mengirim data
+                if (isValid) {
+                    const kelas = document.getElementById('penugasanKelas').value;
+                    const nama = document.getElementById('penugasanTitle').value;
+                    const deadline = document.getElementById('penugasanDeadline').value;
+                    const deskripsi = document.getElementById('penugasanDesc').value;
+                    const fileInput = document.getElementById('penugasanFile');
+                    const file = fileInput.files[0];
+                    const formData = new FormData();
+                    formData.append('kelas', kelas);
+                    formData.append('nama', nama);
+                    formData.append('deadline', deadline);
+                    formData.append('deskripsi', deskripsi);
+                    formData.append('content', file);
+
+                    sendDataTugas(formData);
+                }
+            }
+    
+            // Menambahkan event listener untuk submit form
+            form.onsubmit = submitFormTugas;
+        });
+    
+        // Fungsi untuk mengirim data ke backend
+        function sendDataTugas(data) {
+            const kelas = document.getElementById('penugasanKelas').value;
+            fetch('/api/upload-tugas', {
+                method: 'POST', // Menggunakan POST untuk mengirim data
+                body: data, // Mengirimkan data dalam format multipart/form-data
+            })
+            .then(response => response.json()) // Mengambil response dalam format JSON
+            .then(data => {
+                // Menangani berbagai status dari response
+                if (data.status === "success") {
+                    showAlert(data.message, 'fas fa-check-circle', 'bg-green-500');
+                    setTimeout(() => {
+                        window.location.href = `/dashboard/kelas/${kelas}`;
+                    }, 1500);
+                } else if (data.status === "error") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error); // Menampilkan error di konsol
+                showAlert('Terjadi masalah saat mencoba menghubungi server.', 'fa-solid fa-xmark', 'bg-red-500');
+            });
+        }
+    </script>           
+</body>
+</html>

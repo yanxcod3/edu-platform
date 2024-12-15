@@ -1,0 +1,255 @@
+<%- include('../../partials/head') %>
+
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-10 bg-blue-600 text-white p-2 rounded-md">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex h-screen">
+        <%- include('../../partials/sidebar-siswa') %>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="flex-1 mx-auto px-4 lg:px-16 p-4 lg:p-6 transition-all duration-300 ease-in-out w-full lg:ml-64">
+            <!-- Welcome Header -->
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-6 mt-12 lg:mt-0">
+                <h2 class="text-2xl lg:text-3xl font-semibold mb-4 lg:mb-0">Selamat Datang, <span class="text-blue-600 font-bold" id="username"><%= user.users_nama %></span></h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Profile Info (Email and Institution Name) -->
+                    <div class="flex flex-col text-right hidden lg:block lg:text-left cursor-pointer" id="profileInfo">
+                        <p class="text-sm font-semibold text-gray-600" id="email"><%= user.users_email %></p>
+                        <p class="text-sm font-semibold text-gray-600" id="institution"><%= user.users_instansi %></p>
+                    </div>
+                
+                    <!-- Profile Image and Dropdown -->
+                    <div class="relative">
+                        <img src="<%= user.users_profile %>" alt="Foto Profil" class="w-10 h-10 rounded-full cursor-pointer" id="profilePic">
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute mt-2 w-48 transform -translate-x-1/2 left-1/2 lg:left-auto lg:right-[-100px] bg-white shadow-lg rounded-lg z-10 hidden" id="dropdownMenu">
+                            <ul>
+                                <li><a href="#editProfile" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Edit Profil</a></li>
+                                <li><a href="#logout" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informasi Dashboard -->
+            <section id="dashboardInfo" class="mb-8 lg:mb-12">
+                <h3 class="text-xl lg:text-2xl font-semibold mb-4">Dashboard Siswa</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                    <!-- Tugas yang Dikerjakan -->
+                    <div class="bg-white p-4 lg:p-6 rounded-lg shadow-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-clipboard-check text-blue-500 text-2xl lg:text-3xl mr-4"></i>
+                            <h4 class="text-lg lg:text-xl font-medium">Tugas Selesai</h4>
+                        </div>
+                        <p class="text-gray-600">Total yang sudah diselesaikan: <span id="tugasCount">0</span> dari 10 tugas.</p>
+                    </div>
+            
+                    <!-- Materi yang Dilihat -->
+                    <div class="bg-white p-4 lg:p-6 rounded-lg shadow-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-book-open text-green-500 text-2xl lg:text-3xl mr-4"></i>
+                            <h4 class="text-lg lg:text-xl font-medium">Materi Dilihat</h4>
+                        </div>
+                        <p class="text-gray-600">Total yang sudah dilihat: <span id="materiCount">0</span> dari 12 materi.</p>
+                    </div>
+            
+                    <!-- Kuis yang Diselesaikan -->
+                    <div class="bg-white p-4 lg:p-6 rounded-lg shadow-lg">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-puzzle-piece text-orange-500 text-2xl lg:text-3xl mr-4"></i>
+                            <h4 class="text-lg lg:text-xl font-medium">Quis Selesai</h4>
+                        </div>
+                        <p class="text-gray-600">Total yang sudah diselesaikan: <span id="kuisCount">0</span> dari 5 Quiz.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Grafik -->
+            <section id="grafik" class="mb-8 lg:mb-12">
+                <h3 class="text-xl lg:text-2xl font-semibold mb-4">Statistik Aktivitas Siswa</h3>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <canvas id="activityChart" class="w-full h-full lg:h-[350px]"></canvas>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const overlay = document.getElementById('overlay');
+        let isExpanded = true;
+
+        // Toggle untuk Desktop
+        function toggleDesktopSidebar() {
+            isExpanded = !isExpanded;
+            
+            if (!isExpanded) {
+                sidebar.style.width = '64px';
+                mainContent.style.marginLeft = '64px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(text => text.style.display = 'none');
+            } else {
+                sidebar.style.width = '256px';
+                mainContent.style.marginLeft = '256px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(text => text.style.display = 'inline');
+            }
+        }
+
+        // Toggle untuk Mobile
+        function toggleMobileSidebar() {
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('sidebarToggle').addEventListener('click', toggleDesktopSidebar);
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        overlay.addEventListener('click', toggleMobileSidebar);
+
+        // Handle Responsive Behavior
+        function handleResize() {
+            const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+            
+            if (isDesktop) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+                mainContent.style.marginLeft = isExpanded ? '256px' : '64px';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+    </script>
+    <script>
+        // Get the profile info, profile pic, and the dropdown menu
+        const profileInfo = document.getElementById('profileInfo');
+        const profilePic = document.getElementById('profilePic');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+    
+        // Add click event listener to the profile info and profile pic to toggle the dropdown menu
+        const toggleDropdown = () => {
+            dropdownMenu.classList.toggle('hidden');
+        };
+    
+        profileInfo.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        profilePic.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents event from bubbling up to the document
+            toggleDropdown();
+        });
+    
+        // Optionally, close the dropdown when clicking outside of it
+        document.addEventListener('click', (e) => {
+            if (!dropdownMenu.contains(e.target) && !profileInfo.contains(e.target) && !profilePic.contains(e.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>    
+
+    <!-- Script untuk Chart -->
+    <script>
+        const xValues = ["Tugas", "Materi", "Quiz"];
+        let yValues = [0, 0, 0];
+        const barColors = ["teal", "green", "orange"];
+    
+        const config = {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: barColors,
+                    data: yValues,
+                    borderRadius: 10,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const value = tooltipItem.raw;
+                                return ` Total: ${value}`;
+                            }
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutBounce'
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: true,
+                            color: "rgba(0, 0, 0, 0.1)"
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: true,
+                            color: "rgba(0, 0, 0, 0.1)"
+                        }
+                    }
+                }
+            }
+        };
+    
+        // Create chart
+        const activityChart = new Chart(
+            document.getElementById('activityChart'),
+            config
+        );
+    
+        // Update Real-time Data
+        function updateRealTimeData() {
+            let tugas = Math.min(activityChart.data.datasets[0].data[0] + Math.floor(Math.random() * 2), 8);
+            let materi = Math.min(activityChart.data.datasets[0].data[1] + Math.floor(Math.random() * 2), 6);
+            let kuis = Math.min(activityChart.data.datasets[0].data[2] + Math.floor(Math.random() * 2), 3);
+    
+            // Update chart data
+            activityChart.data.datasets[0].data = [tugas, materi, kuis];
+            activityChart.update();
+    
+            // Update UI counters (if you have elements like these)
+            document.getElementById('tugasCount').innerText = tugas;
+            document.getElementById('materiCount').innerText = materi;
+            document.getElementById('kuisCount').innerText = kuis;
+        }
+    
+        // Call updateRealTimeData every 3 seconds
+        setInterval(updateRealTimeData, 1000);
+    </script>    
+</body>
+</html>

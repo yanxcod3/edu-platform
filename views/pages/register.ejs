@@ -1,0 +1,412 @@
+<%- include('../partials/head') %>
+
+<body class="bg-gray-100 font-sans">
+
+    <!-- Container -->
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white w-full max-w-xl rounded-lg shadow-lg overflow-hidden">
+            
+            <!-- Header -->
+            <div class="bg-blue-100 p-6 text-center">
+                <h1 class="text-2xl font-bold text-blue-600">REGISTER EDUPLATFORM</h1>
+            </div>
+            
+            <!-- Form -->
+            <form id="register" class="p-6" onsubmit="submitForm(event)">
+                <div class="md:grid grid-cols-2 md:gap-4 space-y-2 md:space-y-0">
+                    <!-- Nama -->
+                    <div class="order-1 md:order-1">
+                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama <span class="text-red-500">*</span></label>
+                        <input type="text" id="nama" name="nama" placeholder="Masukkan nama" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p id="nama-msg" class="text-red-500 text-sm mt-1 hidden">Nama wajib diisi.</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="order-2 md:order-3">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="Masukan Email" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p id="email-msg" class="text-red-500 text-sm mt-1 hidden">Email wajib diisi.</p>
+                    </div>
+
+                    <!-- Kata Sandi -->
+                    <div class="order-3 relative md:order-5">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi <span class="text-red-500">*</span></label>
+                        <input type="password" id="password" name="password" placeholder="Masukkan Kata Sandi" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <i id="togglePassword" class="absolute top-10 right-3 fas fa-eye text-gray-500 cursor-pointer"></i>
+                        <p id="password-msg" class="text-red-500 text-sm mt-1 hidden">Kata Sandi wajib diisi.</p>
+                    </div>
+
+                    <!-- Konfirmasi Kata Sandi -->
+                    <div class="order-4 relative md:order-7">
+                        <label for="konfirmasi_password" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Kata Sandi <span class="text-red-500">*</span></label>
+                        <input type="password" id="konfirmasi_password" name="konfirmasi_password" placeholder="Masukkan Kata Sandi" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <i id="toggleConfirmPassword" class="absolute top-10 right-3 fas fa-eye text-gray-500 cursor-pointer"></i>
+                        <p id="konfirmasi_password-msg" class="text-red-500 text-sm mt-1 hidden">Konfirmasi Kata Sandi wajib diisi.</p>
+                    </div>
+                    
+                    <!-- Peran -->
+                    <div class="order-5 md:order-2">
+                        <label for="peran" class="block text-sm font-medium text-gray-700 mb-1">Mendaftar sebagai <span class="text-red-500">*</span></label>
+                        <select id="peran" name="peran" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="" hidden>Pilih Peran</option>
+                            <option value="SISWA">Siswa</option>
+                            <option value="GURU">Guru</option>
+                        </select>
+                        <p id="peran-msg" class="text-red-500 text-sm mt-1 hidden">Peran wajib diisi.</p>
+                    </div>
+
+                    <!-- Jenjang Pendidikan -->
+                    <div class="order-6 md:order-4">
+                        <label for="jenjang" class="block text-sm font-medium text-gray-700 mb-1">Jenjang Pendidikan <span class="text-red-500">*</span></label>
+                        <select id="jenjang" name="jenjang" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="" hidden>Pilih Jenjang</option>
+                            <option value="SD">SD</option>
+                            <option value="SMP">SMP</option>
+                            <option value="SMA">SMA</option>
+                            <option value="UMUM">Umum</option>
+                        </select>
+                        <p id="jenjang-msg" class="text-red-500 text-sm mt-1 hidden">Jenjang Pendidikan wajib diisi.</p>
+                    </div>
+                    
+                    <!-- Organisasi -->
+                    <div class="order-7 md:order-6 relative">
+                        <label for="instansi" class="block text-sm font-medium text-gray-700 mb-1">Organisasi / Instansi / Sekolah <span class="text-red-500">*</span></label>
+                        <input type="text" id="instansi" name="instansi" placeholder="Masukkan Organisasi / Instansi / Sekolah" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" autocomplete="off">
+                        <p id="instansi-msg" class="text-red-500 text-sm mt-1 hidden">Organisasi / Instansi / Sekolah wajib diisi.</p>
+                        <p id="instansi-err-msg" class="text-red-500 text-sm mt-1 hidden">Isi dengan daftar yang tersedia!</p>
+                        <ul id="instansi-results" class="hidden absolute w-full mt-2 border border-gray-300 rounded-lg bg-white shadow-lg max-h-48 overflow-y-auto z-10"></ul> <!-- Daftar hasil pencarian -->
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-6 flex justify-between">
+                    <!-- Tombol Kembali, mengarah ke login.html -->
+                    <a href="/">
+                        <button type="button" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300">Kembali</button>
+                    </a>
+                    
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600">Register</button>
+                </div>
+                
+
+                
+                <!-- Link ke Login -->
+                <div class="mt-4 text-center">
+                    <p class="text-black">Sudah memiliki akun? <a href="/login" class="text-blue-500 hover:underline font-semibold">Login Sekarang</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div id="alert" class="fixed bottom-6 right-6 text-white z-50 p-4 rounded-lg shadow-lg hidden">
+        <p><i id="alertIcon"></i><span id="alertMessage"></span></p>
+    </div>  
+
+    <script>
+        function showAlert(message, icon, color) {
+            const alertElement = document.getElementById('alert');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMessage = document.getElementById('alertMessage');
+
+            // Update ikon dan pesan
+            alertIcon.className = icon; // Mengganti kelas ikon
+            alertMessage.textContent = ` ${message}`; // Mengganti pesan
+            alertElement.className = `fixed bottom-6 right-6 text-white z-50 p-4 rounded-lg shadow-lg hidden ${color}`;
+
+            // Tampilkan alert
+            alertElement.classList.remove('hidden');
+
+            // Sembunyikan alert setelah 3 detik
+            setTimeout(() => {
+                alertElement.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+    <script>
+        const instansiInput = document.getElementById('instansi');
+        const resultsContainer = document.getElementById('instansi-results');
+        const instansiMsg = document.getElementById('instansi-err-msg');
+        const jenjangSelect = document.getElementById('jenjang'); // Add jenjang select element
+        let availableInstansi = []; // Daftar instansi hasil pencarian
+
+        // Fungsi untuk mencari instansi berdasarkan input pengguna dan jenjang yang dipilih
+        async function searchInstansi(query, jenjang) {
+            try {
+                const response = await fetch(`/api/instansi?q=${query}&jenjang=${jenjang}`);
+                if (response.ok) {
+                    const instansiList = await response.json();
+                    availableInstansi = instansiList.map(data => data.instansi_nama); // Simpan nama instansi
+
+                    // Menampilkan hasil pencarian
+                    if (instansiList.length > 0) {
+                        const resultsHtml = instansiList.map(data => {
+                            return `<li class="p-2 cursor-pointer hover:bg-gray-100" onclick="selectInstansi('${data.instansi_nama}')">${data.instansi_nama}</li>`;
+                        }).join('');
+                        resultsContainer.innerHTML = resultsHtml;
+                        resultsContainer.classList.remove('hidden');
+                    } else {
+                        // Display message when no results are found
+                        resultsContainer.innerHTML = `<li class="p-2 text-gray-500">Data ${jenjang == "UMUM" ? 'Umum' : jenjang} tidak tersedia</li>`;
+                        resultsContainer.classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching instansi data:', error);
+            }
+        }
+
+        // Fungsi untuk memilih instansi
+        function selectInstansi(instansiName) {
+            instansiInput.value = instansiName;
+            resultsContainer.classList.add('hidden');
+            validateInstansi(); // Validasi setelah memilih
+        }
+
+        // Fungsi untuk memvalidasi input instansi
+        function validateInstansi() {
+            const inputValue = instansiInput.value.trim();
+            if (availableInstansi.includes(inputValue)) {
+                instansiMsg.classList.add('hidden');
+                instansiInput.setCustomValidity(''); // Input valid
+            } else {
+                instansiMsg.classList.remove('hidden');
+            }
+        }
+
+        // Event listener untuk menangani input pencarian
+        instansiInput.addEventListener('input', () => {
+            const query = instansiInput.value.trim();
+            const jenjang = jenjangSelect.value; // Get selected jenjang value
+            if (query.length >= 1) {
+                searchInstansi(query, jenjang); // Hanya mencari jika ada input yang lebih dari 1 karakter
+            } else {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+
+        // Menampilkan semua opsi saat kolom input diklik
+        instansiInput.addEventListener('click', () => {
+            const jenjang = jenjangSelect.value; // Get selected jenjang value
+            if (availableInstansi.length === 0) {
+                searchInstansi('', jenjang); // Mengambil semua data instansi berdasarkan jenjang
+            } else {
+                resultsContainer.classList.remove('hidden');
+            }
+        });
+
+        // Event listener untuk menangani perubahan pada dropdown jenjang
+        jenjangSelect.addEventListener('change', () => {
+            // Reset the instansi input value and hide the results container when jenjang is changed
+            availableInstansi = [];
+            instansiInput.value = ''; // Clear instansi input
+            resultsContainer.classList.add('hidden'); // Hide the results container
+        });
+
+        // Validasi saat kehilangan fokus
+        instansiInput.addEventListener('blur', validateInstansi);
+
+        // Menyembunyikan hasil pencarian ketika pengguna mengklik di luar input
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('#instansi')) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    </script>    
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPassword = document.getElementById('konfirmasi_password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = password.type === 'password' ? 'text' : 'password';
+            password.type = type;
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        toggleConfirmPassword.addEventListener('click', function () {
+            const type = confirmPassword.type === 'password' ? 'text' : 'password';
+            confirmPassword.type = type;
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("register");
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const nama = urlParams.get('nama');
+            const email = urlParams.get('email');
+            if (nama || email) {
+                document.getElementById('nama').value = nama;
+                document.getElementById('email').value = email;
+            }
+            
+            form.querySelectorAll("input, select").forEach((input) => {
+                input.addEventListener("input", () => {
+                    const msg = document.getElementById(`${input.id}-msg`);
+                    if (msg && input.value.trim() !== "") {
+                        msg.classList.add("hidden");
+                    }
+                });
+            });
+    
+            function checkPasswordStrength(password) {
+                const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                return strongPasswordPattern.test(password);
+            }
+    
+            function validatePassword() {
+                const passwordInput = document.getElementById("password");
+                const passwordMsg = document.getElementById("password-msg");
+                if (passwordInput.value.trim() === "") {
+                    passwordMsg.classList.remove("hidden");
+                    passwordMsg.textContent = "Kata sandi wajib diisi.";
+                } else if (!checkPasswordStrength(passwordInput.value)) {
+                    passwordMsg.classList.remove("hidden");
+                    passwordMsg.textContent =
+                        "Kata sandi harus minimal 8 karakter, mengandung huruf besar, angka, dan simbol.";
+                } else {
+                    passwordMsg.classList.add("hidden");
+                }
+            }
+    
+            function validatePasswordMatch() {
+                const passwordInput = document.getElementById("password");
+                const password2Input = document.getElementById("konfirmasi_password");
+                const password2Msg = document.getElementById("konfirmasi_password-msg");
+                if (password2Input.value.trim() === "") {
+                    password2Msg.classList.remove("hidden");
+                    password2Msg.textContent = "Konfirmasi kata sandi wajib diisi.";
+                } else if (password2Input.value !== passwordInput.value) {
+                    password2Msg.classList.remove("hidden");
+                    password2Msg.textContent = "Kata sandi tidak cocok.";
+                } else {
+                    password2Msg.classList.add("hidden");
+                }
+            }
+    
+            function submitForm(event) {
+                event.preventDefault();
+                let isValid = true;
+    
+                const namaInput = document.getElementById("nama");
+                const namaMsg = document.getElementById("nama-msg");
+                if (namaInput.value.trim() === "") {
+                    namaMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    namaMsg.classList.add("hidden");
+                }
+    
+                const peranInput = document.getElementById("peran");
+                const peranMsg = document.getElementById("peran-msg");
+                if (peranInput.value === "") {
+                    peranMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    peranMsg.classList.add("hidden");
+                }
+    
+                const emailInput = document.getElementById("email");
+                const emailMsg = document.getElementById("email-msg");
+                if (emailInput.value.trim() === "") {
+                    emailMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    emailMsg.classList.add("hidden");
+                }
+    
+                const jenjangInput = document.getElementById("jenjang");
+                const jenjangMsg = document.getElementById("jenjang-msg");
+                if (jenjangInput.value === "") {
+                    jenjangMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    jenjangMsg.classList.add("hidden");
+                }
+    
+                validatePassword();
+                const passwordMsg = document.getElementById("password-msg");
+                if (!passwordMsg.classList.contains("hidden")) {
+                    isValid = false;
+                }
+    
+                validatePasswordMatch();
+                const password2Msg = document.getElementById("konfirmasi_password-msg");
+                if (!password2Msg.classList.contains("hidden")) {
+                    isValid = false;
+                }
+    
+                const instansiInput = document.getElementById("instansi");
+                const instansiMsg = document.getElementById("instansi-msg");
+                if (instansiInput.value.trim() === "") {
+                    instansiMsg.classList.remove("hidden");
+                    isValid = false;
+                } else {
+                    instansiMsg.classList.add("hidden");
+                }
+    
+                if (isValid) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const profile = urlParams.get('profile');
+
+                    const nama = document.getElementById('nama').value;
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('konfirmasi_password').value;
+                    const peran = document.getElementById('peran').value;
+                    const jenjang = document.getElementById('jenjang').value;
+                    const instansi = document.getElementById('instansi').value;
+
+                    const userData = {
+                        profile:  profile || `https://ui-avatars.com/api/?name=${encodeURIComponent(nama)}`,
+                        nama: nama,
+                        email: email,
+                        password: password,
+                        peran: peran,
+                        jenjang: jenjang,
+                        instansi: instansi
+                    };
+                    
+                    sendData(userData)
+                }
+            }
+    
+            document.getElementById("password").addEventListener("input", validatePassword);
+            document.getElementById("konfirmasi_password").addEventListener("input", validatePasswordMatch);
+
+            form.onsubmit = submitForm;
+        });
+
+        function sendData(data) {
+            const url = new URL('/api/users/register', window.location.origin);
+            Object.keys(data).forEach(key => url.searchParams.append(key, data[key]));
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    showAlert(data.message, 'fas fa-check-circle', 'bg-green-500');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 3000);
+                } else if (data.status === "duplicate") {
+                    showAlert(data.message, 'fa-solid fa-circle-exclamation', 'bg-blue-500');
+                } else if (data.status === "error") {
+                    showAlert(data.message, 'fa-solid fa-xmark', 'bg-red-500');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Terjadi masalah saat mencoba menghubungi server.', 'fa-solid fa-xmark', 'bg-red-500');
+            });
+        }
+    </script>
+</body>
+</html>

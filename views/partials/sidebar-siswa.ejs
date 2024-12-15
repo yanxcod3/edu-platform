@@ -1,0 +1,64 @@
+<!-- Overlay untuk mobile -->
+<div id="overlay" class="fixed inset-0 bg-black opacity-50 hidden z-30 lg:hidden"></div>
+
+<!-- Sidebar -->
+<div id="sidebar" class="bg-blue-600 text-white flex flex-col justify-between fixed h-full transition-all duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 z-40" style="width: 256px;">
+    <!-- Desktop Toggle Button -->
+    <button id="sidebarToggle" class="hidden lg:block absolute -right-4 top-4 bg-blue-600 text-white p-2 rounded-full shadow-lg z-50">
+        <i class="fas fa-chevron-left transition-transform duration-300" id="toggleIcon"></i>
+    </button>
+
+    <!-- Header (Center text) -->
+    <div class="flex items-center justify-center p-4">
+        <a href="/dashboard" class="text-3xl font-semibold text-center mb-6 sidebar-text">
+            <img src="/img/logo.png" alt="Logo" class="w-50 h-15">
+        </a>
+    </div>
+
+    <!-- Menu Utama (Tanpa Gap) -->
+    <div class="flex flex-col p-4 flex-grow">
+        <ul>
+            <li>
+                <a href="/dashboard/manajemen-kelas" class="flex items-center text-lg hover:text-blue-300 py-2">
+                    <i class="fas fa-chalkboard-teacher w-8"></i>
+                    <span class="sidebar-text ml-3">Kelas</span>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard/tugas" class="flex items-center text-lg hover:text-blue-300 py-2">
+                    <i class="fas fa-tasks w-8"></i>
+                    <span class="sidebar-text ml-3">Tugas</span>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard/pengumuman" class="flex items-center text-lg hover:text-blue-300 py-2">
+                    <i class="fas fa-bullhorn w-8"></i>
+                    <span class="sidebar-text ml-3">Pengumuman</span>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard/forum-diskusi" class="flex items-center text-lg hover:text-blue-300 py-2">
+                    <i class="fas fa-comments w-8"></i>
+                    <span class="sidebar-text ml-3">Forum Diskusi</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="p-4">
+        <ul>
+            <li>
+                <a href="/dashboard/arsip-kelas" class="flex items-center text-lg hover:text-blue-300 py-2">
+                    <i class="fa-solid fa-box-archive w-8"></i>
+                    <span class="sidebar-text ml-3">Arsip Kelas</span>
+                </a>
+            </li>
+            <li>
+                <a href="/dashboard/logout" class="flex items-center text-lg hover:text-blue-300 py-2">
+                    <i class="fas fa-sign-out-alt w-8"></i>
+                    <span class="sidebar-text ml-3">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
